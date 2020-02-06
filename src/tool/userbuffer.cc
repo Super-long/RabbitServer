@@ -2,7 +2,7 @@
 #include <cstring>
 
 namespace ws{
-
+ 
     void UserBuffer::Read(char* Start, int bytes) {
         if(Read_Spot + bytes > Write_Spot){
             throw std::out_of_range("'UserBuffer::Read' Out ou range when reading.");
