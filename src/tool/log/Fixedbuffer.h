@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <cstring>
 #include "basebuffer.h"
-#include "../base/nocopy.h"
+#include "../../base/nocopy.h"
  
 namespace ws{
 
