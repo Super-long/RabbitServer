@@ -4,6 +4,8 @@
 #include <string>
 #include <string.h>
 #include <functional>
+#include "logstream.h"
+#include "timestamp.h"
 
 namespace ws{
 
@@ -33,7 +35,7 @@ public:
             }
 
         explicit Filewrapper(const std::string& filename)
-            :data_(filename){
+            :data_(filename.c_str()){
                 const char* point = strrchr(data_, '/');
                 if(point){
                     data_ = point + 1;
@@ -45,34 +47,34 @@ public:
         int size_;
     };
 
-    Logger(SourceFile file, int line);
-    Logger(SourceFile file, int line, LogLevel level);
-    Logger(SourceFile file, int line, LogLevel level, const char* func);
-    Logger(SourceFile file, int line, bool toAbort);
+    logging(Filewrapper file, int line);
+    logging(Filewrapper file, int line, logging::Loglevel level);
+    logging(Filewrapper file, int line, Loglevel level, const char* str);
+    logging(Filewrapper file, int line, bool toAbort);
+    ~logging();
 
-    //TODO
+    logstream& stream() { return wrapper_.stream_; }
 
-    static LogLevel logLevel();
-    static void setLogLevel(LogLevel level);
+    static Loglevel logLevel();
+    inline static void setLoglevel(Loglevel level);
     using OutputFun = std::function<void(const char*, int)>;
     using FlushFun = std::function<void(void)>;
-    static void setOutput(OutputFunc);
-    static void setFlush(FlushFunc);
+    static void setOutput(OutputFun fun);
+    static void setFlush(FlushFun fun);
     //TODO
 
 private:
-    class Funwrapper{
-        typedef Logger::LogLevel LogLevel;
-        Impl(LogLevel level, int old_errno, const SourceFile& file, int line);
+    struct Funwrapper{
+        using Loglevel = logging::Loglevel;
+        Funwrapper(Loglevel level, int old_errno, const Filewrapper& file, int line);
         void formatTime();
         void finish();
 
         Timestamp time_;
-        //TODO
-        //LogStream stream_;
-        LogLevel level_;
+        logstream stream_;
+        Loglevel level_;
         int line_;
-        SourceFile basename_;
+        Filewrapper basename_;
     };
 
     Funwrapper wrapper_;
@@ -80,13 +82,21 @@ private:
 
 /*--------------------------------*/
 
-extern Logger::LogLevel g_logLevel //全局唯一的,即默认日志级别
+extern logging::Loglevel g_Loglevel; //全局唯一的,即默认日志级别
 
-inline Logger::LogLevel Logger::logLevel(){
-    return g_logLevel;
+inline logging::Loglevel logLevel(){
+    return g_Loglevel;
 }
 
-//TODO stream没写这些写不了
+#define LOG_DEBUG if (logging::Loglevel() <= logging::DEBUG) \
+  logging(__FILE__, __LINE__, logging::DEBUG, __func__).stream()
+#define LOG_INFO if (logging::Loglevel() <= logging::INFO) \
+  logging(__FILE__, __LINE__).stream()
+#define LOG_WARN logging(__FILE__, __LINE__, logging::WARN).stream()
+#define LOG_ERROR logging(__FILE__, __LINE__, logging::ERROR).stream()
+#define LOG_FATAL logging(__FILE__, __LINE__, logging::FATAL).stream()
+
+const char* strerror_tl(int savedErrno);
 
 }
 
