@@ -13,7 +13,7 @@ class Timestamp : public Copyable,
                   public boost::equality_comparable<Timestamp>,
                   public boost::less_than_comparable<Timestamp>{
 public:
-    Timestamp() : microsecondes(){}
+    Timestamp() : microseconds(){}
     explicit Timestamp(uint64_t args) : microseconds(args){}
 
     void swap(Timestamp& T){
@@ -37,8 +37,9 @@ public:
     static Timestamp fromUnixTime(time_t t, int microseconds){
         return Timestamp(static_cast<int64_t>(t) * KmicroSecond + microseconds);
     }
-private:
+
     static constexpr const int KmicroSecond = 1E6;
+private:
     uint64_t microseconds;
 };
 
@@ -52,7 +53,7 @@ inline bool operator==(Timestamp lhs, Timestamp rhs){
 
 inline Timestamp addTime(Timestamp timestamp, double seconds){
     uint64_t delta = static_cast<uint64_t>(seconds * Timestamp::KmicroSecond);
-    return Timestamp(timestamp.Data_microsecond()) + delta);
+    return Timestamp(timestamp.Data_microsecond() + delta);
 }
 
 }

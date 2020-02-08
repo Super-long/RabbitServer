@@ -1,4 +1,6 @@
 #include "asynclogging.h"
+#include "logfile.h"
+#include "timestamp.h"
 #include <chrono>
 
 namespace ws{
@@ -23,7 +25,6 @@ void
 AsyncLogging::start(){
     running = true;
     thread_ = std::thread(&AsyncLogging::AsyncFunc, this);
-    //TODO latch
 }
 
 void
@@ -52,7 +53,7 @@ AsyncLogging::append(const char* line, int len){
 
 void
 AsyncLogging::AsyncFunc(){
-    //TODO Logfile
+    logfile ouput(basename, rollsize_, false);
     Bufferptr newBuffer1(new Buffer);
     Bufferptr newBuffer2(new Buffer);
     newBuffer1->setZero();
@@ -77,11 +78,18 @@ AsyncLogging::AsyncFunc(){
 
         //处理内存堆积 日志占用过多内存
         if(WriteLog.size() > 25){
-          
+            char buf[256];
+            snprintf(buf, sizeof buf, "Dropped log messages at %s, %zd larger buffers\n",
+                     Timestamp::now().toFormattedString().c_str(),
+                     buffersToWrite.size()-2);
+            fputs(buf, stderr);
+            output.append(buf, static_cast<int>(strlen(buf)));
+            buffersToWrite.erase(buffersToWrite.begin()+2, buffersToWrite.end());//留两个缓冲块
         }
 
         for(const auto& buffer : WriteLog){
-          //TODO 写入文件
+            output.append(buffer->data(), buffer->length());
+            //writev 分块写入是要快 但是使用buffer的write也不慢
         }
 
         if(WriteLog.size() > 2){
@@ -100,8 +108,9 @@ AsyncLogging::AsyncFunc(){
           newBuffer2->setSpotBegin();
         }
         WriteLog.clear();
-        //TODO
+        ouput.flush();
     }
+    ouput.flush();
 }
 
 }

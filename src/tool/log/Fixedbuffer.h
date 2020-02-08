@@ -28,8 +28,8 @@ public:
     uint32_t avail() const {return Length() - Spot;}
     void add(uint32_t len) {Spot += len;}
     void setSpotBegin() {Spot = 0;}
-    char* current() const {return std::advance(Buffer_, Spot);}
-    const char* data() const {return Buffer_;}
+    char* current() const {return std::advance(Buffer_.get(), Spot);}
+    const char* data() const {return Buffer_.get();}
     void setZero() {memset(Buffer_.get(), 0, BufferSize);}
     std::string toString(){return std::string(Buffer_.get(), Spot);}
 
