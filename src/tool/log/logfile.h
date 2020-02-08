@@ -1,5 +1,5 @@
-#ifndef WEB_SERVER_LOGFILE_H
-#define WEB_SERVER_LOGFILE_H
+#ifndef LOGFILE_H
+#define LOGFILE_H
 
 #include <memory>
 #include <mutex>
@@ -47,4 +47,4 @@ private:
 
 }
 
-#endif //WEB_SERVER_LOGFILE_H
+#endif //LOGFILE_H
