@@ -51,7 +51,7 @@ public:
     logging(Filewrapper file, int line, logging::Loglevel level);
     logging(Filewrapper file, int line, Loglevel level, const char* str);
     logging(Filewrapper file, int line, bool toAbort);
-    ~logging();
+    ~logging(); 
 
     logstream& stream() { return wrapper_.stream_; }
 

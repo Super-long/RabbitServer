@@ -1,7 +1,7 @@
 #ifndef DATA_H_
 #define DATA_H_
 
-#include <types.h>
+//#include <ctypes.h>
 #include <string>
 #include <algorithm>
 #include "../../base/copyable.h"

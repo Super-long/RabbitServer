@@ -34,7 +34,7 @@ namespace ws{
         using TVN_ = std::list<std::shared_ptr<timernode>>[256];
         using TVR_ = std::list<std::shared_ptr<timernode>>[64];
         public:
-            using Fun = std::function<int(int)>;
+            //using Fun = std::function<int(int)>;
 
             TimerWheel() : currenttime(0){} 
 

@@ -7,7 +7,6 @@
 #include <sstream>
 #include <assert.h>
 
-
 namespace ws{
 
 namespace detail{
@@ -40,8 +39,8 @@ void defaultFlush(){
 }
 
 logging::Loglevel g_logLevel = initLogLevel();
-logging::OutputFun g_output(defaultOutput);
-logging::FlushFun g_flush(defaultFlush);
+logging::OutputFun g_output_(defaultOutput);
+logging::FlushFun g_flush_(defaultFlush);
 TimeZone g_logTimeZone;
 
 constexpr const char* LogLevelName[logging::NUM_LOG_LEVELS] = {
@@ -56,8 +55,7 @@ constexpr const char* LogLevelName[logging::NUM_LOG_LEVELS] = {
 struct helper{ //TODO 可以到时候改成constexper
      helper(const char* str, unsigned len)
             :str_(str),
-             len_(len)
-    {
+             len_(len){
         assert(strlen(str) == len_);
     }
 
@@ -65,14 +63,12 @@ struct helper{ //TODO 可以到时候改成constexper
     const unsigned len_;
 };
 
-inline logstream& operator<<(logstream& s, const helper& v)
-{
+inline logstream& operator<<(logstream& s, const helper& v){
     s.append(v.str_, v.len_);
     return s;
 }
 
-inline logstream& operator<<(logstream& s, const logging::Filewrapper& v)
-{
+inline logstream& operator<<(logstream& s, const logging::Filewrapper& v){
   s.append(v.data_, v.size_);
   return s;
 }
@@ -82,11 +78,11 @@ void logging::setLoglevel(Loglevel level) {
 }
 
 void logging::setFlush(FlushFun fun) {
-    g_flush = fun;
+    g_flush_ = fun;
 }
 
 void logging::setOutput(OutputFun fun) {
-    g_output = fun;
+    g_output_ = fun;
 }
 
 void logging::setTimeZone(const TimeZone& tz){
@@ -110,9 +106,10 @@ logging::logging(Filewrapper file, int line, bool toAbort)
 logging::~logging(){
     wrapper_.finish();
     const logstream::Buffer& buf(stream().buffer());
-    g_output(buf.data(), buf.Length());
+    g_output_(buf.data(), buf.Length());
+    
     if(wrapper_.level_ == FATAL){
-        g_flush();
+        g_flush_();
         abort();
     }
 }
@@ -121,14 +118,16 @@ logging::Funwrapper::Funwrapper(Loglevel level, int old_errno,
                                 const Filewrapper &file, int line)
     : time_(Timestamp::now()),
     stream_(),
-    level_(level),
+    level_(level), 
     line_(line),
     basename_(file){
     formatTime();
     //TODO
     //CurrentThread::tid();
     //stream_ << T(CurrentThread::tidString(), CurrentThread::tidStringLength());
-    stream_ << helper(LogLevelName[level], 6);
+    std::string str("111111");
+    stream_ << helper(str.c_str(), 6);
+    stream_ << helper(LogLevelName[static_cast<size_t>(level)], 6);
     if (old_errno != 0)
     {
         stream_ << strerror_tl(old_errno) << " (errno=" << old_errno << ") ";
@@ -139,9 +138,9 @@ void logging::Funwrapper::formatTime() {
     int64_t microSecondsSinceEpoch = time_.Data_microsecond();
     time_t seconds = static_cast<time_t>(microSecondsSinceEpoch / Timestamp::KmicroSecond);
     int microseconds = static_cast<int>(microSecondsSinceEpoch % Timestamp::KmicroSecond);
+    struct tm tm_time;
     if (seconds != t_lastSecond){ //秒存储 只更新微秒 这就是优化的地方
         t_lastSecond = seconds;
-        struct tm tm_time;
         if (g_logTimeZone.valid()){
             tm_time = g_logTimeZone.toLocalTime(seconds);
         }else{
@@ -163,6 +162,10 @@ void logging::Funwrapper::formatTime() {
         assert(us.length() == 9);
         stream_ << helper(t_time, 17) << helper(us.data(), 9);
     }
+}
+
+void logging::Funwrapper::finish(){
+    stream_ << " - " << basename_ << ':' << line_ << '\n';
 }
 
 }

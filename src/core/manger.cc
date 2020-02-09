@@ -75,7 +75,7 @@ namespace ws{
     void Manger::TimeWheel(int fd){
         using std::placeholders::_1;
         if(Exist(fd)) Timer_Wheel_->TW_Update(fd);
-        else Timer_Wheel_->TW_Add(fd, std::bind(&Remove, *this, _1));
+        else Timer_Wheel_->TW_Add(fd, std::bind(&Manger::Remove, this, _1));
     } 
 
     void Manger::Writing(int fd, long time){

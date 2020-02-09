@@ -26,7 +26,7 @@ namespace detail{
         assert(basename.find('/') == std::string::npos); //可以 这点也很重要 否则解析会有问题 但我感觉报错就好 没必要assert
         rollFile();
     }
-
+ 
     void
     logfile::append(const char *logline, int len) {
         if(mutex_){

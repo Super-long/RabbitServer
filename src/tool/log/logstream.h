@@ -65,7 +65,7 @@ namespace detail{
             return *this;
         }
 
-        void append(const char* data, int len) { buffer_.append(data, len); }
+        void append(const char* data, int len) {buffer_.append(data, len); }
         const Buffer& buffer() const { return buffer_; }
         void resetBuffer() { buffer_.reset(); }
 
