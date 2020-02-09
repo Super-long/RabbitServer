@@ -3,6 +3,7 @@
 #include <errno.h>
 #include <string.h>
 #include <cstdio>
+#include <stdlib.h>
 #include <sstream>
 #include <assert.h>
 
@@ -15,25 +16,35 @@ thread_local char t_errnoBuf[512];
 thread_local char t_time[64];
 thread_local time_t t_lastSecond;
 
-const char* strerror_tl(int savedErrno)
+const char* strerror_tl(int old_errno)
 {   //thread safe.
-    return strerror_r(savedErrno, t_errnoBuf, sizeof(t_errnoBuf));
+    return strerror_r(old_errno, t_errnoBuf, sizeof(t_errnoBuf));
 }
 
-constexpr Logger::LogLevel initLogLevel()
+logging::Loglevel initLogLevel()
 {
 if (::getenv("LOG_DEBUG"))
-        return Logger::DEBUG;
+        return logging::DEBUG;
     else
-        return Logger::INFO;
+        return logging::INFO;
 }
 
-constexpr Logger::LogLevel g_logLevel = initLogLevel();
+void defaultOutput(const char* msg, int len){
+    size_t n = fwrite(msg, 1, len, stdout);
+    //FIXME check n
+    (void)n;
+}
+
+void defaultFlush(){
+    fflush(stdout);
+}
+
+logging::Loglevel g_logLevel = initLogLevel();
 logging::OutputFun g_output(defaultOutput);
 logging::FlushFun g_flush(defaultFlush);
-//TODO
+TimeZone g_logTimeZone;
 
-constexpr const char* LogLevelName[Logger::NUM_LOG_LEVELS] = {
+constexpr const char* LogLevelName[logging::NUM_LOG_LEVELS] = {
         "DEBUG ",
         "INFO  ",
         "WARN  ",
@@ -54,20 +65,16 @@ struct helper{ //TODO 可以到时候改成constexper
     const unsigned len_;
 };
 
-inline LogStream& operator<<(logstream& s, const helper& v)
+inline logstream& operator<<(logstream& s, const helper& v)
 {
     s.append(v.str_, v.len_);
     return s;
 }
 
-void defaultOutput(const char* msg, int len){
-    size_t n = fwrite(msg, 1, len, stdout);
-    //FIXME check n
-    (void)n;
-}
-
-void defaultFlush(){
-    fflush(stdout);
+inline logstream& operator<<(logstream& s, const logging::Filewrapper& v)
+{
+  s.append(v.data_, v.size_);
+  return s;
 }
 
 void logging::setLoglevel(Loglevel level) {
@@ -79,7 +86,11 @@ void logging::setFlush(FlushFun fun) {
 }
 
 void logging::setOutput(OutputFun fun) {
-    g_flush = fun;
+    g_output = fun;
+}
+
+void logging::setTimeZone(const TimeZone& tz){
+    g_logTimeZone = tz;
 }
 
 logging::logging(Filewrapper file, int line)
@@ -106,12 +117,52 @@ logging::~logging(){
     }
 }
 
-void logging::Funwrapper::finish() {
-    stream_ << " - " << basename_ << ':' << line_ << '\n'
+logging::Funwrapper::Funwrapper(Loglevel level, int old_errno,
+                                const Filewrapper &file, int line)
+    : time_(Timestamp::now()),
+    stream_(),
+    level_(level),
+    line_(line),
+    basename_(file){
+    formatTime();
+    //TODO
+    //CurrentThread::tid();
+    //stream_ << T(CurrentThread::tidString(), CurrentThread::tidStringLength());
+    stream_ << helper(LogLevelName[level], 6);
+    if (old_errno != 0)
+    {
+        stream_ << strerror_tl(old_errno) << " (errno=" << old_errno << ") ";
+    }
 }
 
 void logging::Funwrapper::formatTime() {
+    int64_t microSecondsSinceEpoch = time_.Data_microsecond();
+    time_t seconds = static_cast<time_t>(microSecondsSinceEpoch / Timestamp::KmicroSecond);
+    int microseconds = static_cast<int>(microSecondsSinceEpoch % Timestamp::KmicroSecond);
+    if (seconds != t_lastSecond){ //秒存储 只更新微秒 这就是优化的地方
+        t_lastSecond = seconds;
+        struct tm tm_time;
+        if (g_logTimeZone.valid()){
+            tm_time = g_logTimeZone.toLocalTime(seconds);
+        }else{
+            ::gmtime_r(&seconds, &tm_time); // FIXME TimeZone::fromUtcTime
+        }
 
+        int len = snprintf(t_time, sizeof(t_time), "%4d%02d%02d %02d:%02d:%02d",
+                           tm_time.tm_year + 1900, tm_time.tm_mon + 1, tm_time.tm_mday,
+                           tm_time.tm_hour, tm_time.tm_min, tm_time.tm_sec);
+        assert(len == 17); (void)len;
+    }
+
+    if (g_logTimeZone.valid()){
+        Fmt us(".%06d ", microseconds);
+        assert(us.length() == 8);
+        stream_ << helper(t_time, 17) << helper(us.data(), 8);
+    }else{
+        Fmt us(".%06dZ ", microseconds);
+        assert(us.length() == 9);
+        stream_ << helper(t_time, 17) << helper(us.data(), 9);
+    }
 }
 
 }

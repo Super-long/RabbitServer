@@ -1,5 +1,6 @@
 #include <sys/time.h>
 #include <cstdio>
+#include <inttypes.h>
 #include "timestamp.h"
 
 namespace ws{
@@ -17,7 +18,7 @@ std::string
 Timestamp::toString() const {
     char buf[32] = {0};
     int64_t seconds = microseconds / KmicroSecond;
-    int64_t microseconds = microseconds % KmicroSecond;
+    int64_t microseconds = microseconds % KmicroSecond; //跨平台的效果
     std::snprintf(buf, sizeof(buf)-1, "%" PRId64 ".%06" PRId64 "", seconds, microseconds);
     return buf;
 }

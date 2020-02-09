@@ -1,4 +1,5 @@
 #include "logstream.h"
+#include <assert.h>
 
 namespace ws{
 
@@ -47,55 +48,55 @@ size_t convertHex(char buf[], uintptr_t value){
 
 template<typename T>
 void
-LogStream::formatInteger(T v){
+logstream::formatInteger(T v){
     if (buffer_.avail() >= kMaxNumericSize){
         size_t len = convert(buffer_.current(), v);
         buffer_.add(len);
     }
 }
 
-LogStream& LogStream::operator<<(short v){
+logstream& logstream::operator<<(short v){
     *this << static_cast<int>(v);
     return *this;
 }
 
-LogStream& LogStream::operator<<(unsigned short v){
+logstream& logstream::operator<<(unsigned short v){
     *this << static_cast<unsigned int>(v);
     return *this;
 }
 
-LogStream& LogStream::operator<<(int v){
+logstream& logstream::operator<<(int v){
     formatInteger(v);
     return *this;
 }
 
-LogStream& LogStream::operator<<(unsigned int v){
+logstream& logstream::operator<<(unsigned int v){
     formatInteger(v);
     return *this;
 }
 
-LogStream& LogStream::operator<<(long v){
+logstream& logstream::operator<<(long v){
     formatInteger(v);
     return *this;
 }
 
-LogStream& LogStream::operator<<(unsigned long v){
+logstream& logstream::operator<<(unsigned long v){
     formatInteger(v);
     return *this;
 }
 
-LogStream& LogStream::operator<<(long long v){
+logstream& logstream::operator<<(long long v){
     formatInteger(v);
     return *this;
 }
 
-LogStream& LogStream::operator<<(unsigned long long v){
+logstream& logstream::operator<<(unsigned long long v){
     formatInteger(v);
     return *this;
 }
 
 //十六进制的转换
-LogStream& LogStream::operator<<(const void* p){
+logstream& logstream::operator<<(const void* p){
     uintptr_t v = reinterpret_cast<uintptr_t>(p);
     if (buffer_.avail() >= kMaxNumericSize)
     {
@@ -108,7 +109,7 @@ LogStream& LogStream::operator<<(const void* p){
     return *this;
 }
 
-LogStream& LogStream::operator<<(double v){
+logstream& logstream::operator<<(double v){
     if (buffer_.avail() >= kMaxNumericSize)
     {
         int len = snprintf(buffer_.current(), kMaxNumericSize, "%.12g", v);
@@ -116,6 +117,27 @@ LogStream& LogStream::operator<<(double v){
     }
     return *this;
 }
+
+template<typename T>
+Fmt::Fmt(const char* fmt, T val)
+{
+  length_ = snprintf(buf_, sizeof buf_, fmt, val);
+  assert(static_cast<size_t>(length_) < sizeof buf_);
+}
+
+template Fmt::Fmt(const char* fmt, char);
+
+template Fmt::Fmt(const char* fmt, short);
+template Fmt::Fmt(const char* fmt, unsigned short);
+template Fmt::Fmt(const char* fmt, int);
+template Fmt::Fmt(const char* fmt, unsigned int);
+template Fmt::Fmt(const char* fmt, long);
+template Fmt::Fmt(const char* fmt, unsigned long);
+template Fmt::Fmt(const char* fmt, long long);
+template Fmt::Fmt(const char* fmt, unsigned long long);
+
+template Fmt::Fmt(const char* fmt, float);
+template Fmt::Fmt(const char* fmt, double);
 
 }
 

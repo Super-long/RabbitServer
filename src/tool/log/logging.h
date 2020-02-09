@@ -4,8 +4,9 @@
 #include <string>
 #include <string.h>
 #include <functional>
-#include "logstream.h"
 #include "timestamp.h"
+#include "logstream.h"
+#include "timezone.h"
 
 namespace ws{
 
@@ -22,11 +23,10 @@ public:
         NUM_LOG_LEVELS,
     };
 
-    class Filewrapper{
-    public:
+    struct Filewrapper{
         template<int Num>
-        explicit Filewrapper(const char (&arr)[Num]) //匹配char数组
-            :data_(arr), size_(N - 1){
+        Filewrapper(const char (&arr)[Num]) //匹配char数组
+            :data_(arr), size_(Num - 1){
                 const char* point = strrchr(data_, '/');
                 if(point){
                     data_ = point + 1;
@@ -34,7 +34,7 @@ public:
                 }
             }
 
-        explicit Filewrapper(const std::string& filename)
+        Filewrapper(const std::string& filename)
             :data_(filename.c_str()){
                 const char* point = strrchr(data_, '/');
                 if(point){
@@ -42,7 +42,7 @@ public:
                 }
                 size_ = static_cast<int>(strlen(data_));
             }
-    private:
+
         const char* data_;
         int size_;
     };
@@ -61,6 +61,7 @@ public:
     using FlushFun = std::function<void(void)>;
     static void setOutput(OutputFun fun);
     static void setFlush(FlushFun fun);
+    static void setTimeZone(const TimeZone& tz);
     //TODO
 
 private:
@@ -90,8 +91,9 @@ inline logging::Loglevel logLevel(){
 
 #define LOG_DEBUG if (logging::Loglevel() <= logging::DEBUG) \
   logging(__FILE__, __LINE__, logging::DEBUG, __func__).stream()
-#define LOG_INFO if (logging::Loglevel() <= logging::INFO) \
-  logging(__FILE__, __LINE__).stream()
+/* #define LOG_INFO if (logging::Loglevel() <= logging::INFO) \
+  logging(__FILE__, __LINE__).stream() */
+  #define LOG_INFO logging(__FILE__, __LINE__).stream()
 #define LOG_WARN logging(__FILE__, __LINE__, logging::WARN).stream()
 #define LOG_ERROR logging(__FILE__, __LINE__, logging::ERROR).stream()
 #define LOG_FATAL logging(__FILE__, __LINE__, logging::FATAL).stream()

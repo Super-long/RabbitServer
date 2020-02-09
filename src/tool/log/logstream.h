@@ -10,7 +10,7 @@ namespace detail{
     class logstream{
         using self = logstream;
     public:
-        using Buffer =  FixedBuffer<SmallBuffer>;
+        using Buffer = FixedBuffer<SmallBuffer>;
 
         self& operator<<(bool flag){
             buffer_.append(flag ? "1" : "0", 1);
@@ -55,13 +55,13 @@ namespace detail{
             return operator<<(reinterpret_cast<const char*>(str));
         }
 
-        self& operator<<(const string& v){
+        self& operator<<(const std::string& v){
             buffer_.append(v.c_str(), v.size());
             return *this;
         }
 
         self& operator<<(const Buffer& v){
-            *this << v.toStringPiece();
+            *this << v.toString();
             return *this;
         }
 
@@ -76,6 +76,20 @@ namespace detail{
         template<typename T>
         void formatInteger(T);
     };
+
+class Fmt // : noncopyable
+{
+ public:
+  template<typename T>
+  Fmt(const char* fmt, T val);
+
+  const char* data() const { return buf_; }
+  int length() const { return length_; }
+
+ private:
+  char buf_[32];
+  int length_;
+};
 
 }
 

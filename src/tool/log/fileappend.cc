@@ -1,4 +1,6 @@
 #include "fileappend.h"
+#include "logging.h"
+#include <assert.h>
 
 namespace ws{
 
@@ -16,7 +18,7 @@ namespace detail{
         size_t n = Write(logline, len);
         size_t remain = len - n;
         while (remain > 0){ //写入不完全的情况
-            size_t x = write(logline + n, remain);
+            size_t x = Write(logline + n, remain);
             if (x == 0){
                 int err = ferror(fp_);
                 if (err){//写入出错的时候可以使用ferror检查 非零出错

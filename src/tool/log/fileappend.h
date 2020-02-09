@@ -15,7 +15,7 @@ namespace ws{
 
 namespace detail{
 
-class FileAppend : noncopyable
+class FileAppend : public Nocopy
 {
 public:
     explicit FileAppend(const std::string& filename);

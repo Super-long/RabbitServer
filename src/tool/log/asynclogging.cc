@@ -53,7 +53,7 @@ AsyncLogging::append(const char* line, int len){
 
 void
 AsyncLogging::AsyncFunc(){
-    logfile ouput(basename, rollsize_, false);
+    logfile output(basename, rollsize_, false);
     Bufferptr newBuffer1(new Buffer);
     Bufferptr newBuffer2(new Buffer);
     newBuffer1->setZero();
@@ -81,14 +81,14 @@ AsyncLogging::AsyncFunc(){
             char buf[256];
             snprintf(buf, sizeof buf, "Dropped log messages at %s, %zd larger buffers\n",
                      Timestamp::now().toFormattedString().c_str(),
-                     buffersToWrite.size()-2);
+                     WriteLog.size()-2);
             fputs(buf, stderr);
             output.append(buf, static_cast<int>(strlen(buf)));
-            buffersToWrite.erase(buffersToWrite.begin()+2, buffersToWrite.end());//留两个缓冲块
+            WriteLog.erase(WriteLog.begin()+2, WriteLog.end());//留两个缓冲块
         }
 
         for(const auto& buffer : WriteLog){
-            output.append(buffer->data(), buffer->length());
+            output.append(buffer->data(), buffer->Length());
             //writev 分块写入是要快 但是使用buffer的write也不慢
         }
 
@@ -108,9 +108,9 @@ AsyncLogging::AsyncFunc(){
           newBuffer2->setSpotBegin();
         }
         WriteLog.clear();
-        ouput.flush();
+        output.flush();
     }
-    ouput.flush();
+    output.flush();
 }
 
 }

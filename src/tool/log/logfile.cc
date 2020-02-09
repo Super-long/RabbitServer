@@ -1,12 +1,14 @@
 #include "logfile.h"
+#include <assert.h>
 #include <time.h>
+#include <string>
 #include <cstdio>
 #include <assert.h>
 
 namespace ws{
 
 namespace detail{
-    LogFile::LogFile(const string& basename,
+    logfile::logfile(const std::string& basename,
                      off_t rollSize,
                      bool threadSafe,
                      int flushInterval,
@@ -21,7 +23,7 @@ namespace detail{
               lastRoll_(0),
               lastFlush_(0)
     {
-        assert(basename.find('/') == string::npos); //可以 这点也很重要 否则解析会有问题 但我感觉报错就好 没必要assert
+        assert(basename.find('/') == std::string::npos); //可以 这点也很重要 否则解析会有问题 但我感觉报错就好 没必要assert
         rollFile();
     }
 
@@ -46,7 +48,7 @@ namespace detail{
 
     void logfile::rollFile() {
         time_t now = 0;
-        std::string filename = getLogFileName(basename_, &now);
+        std::string filename = getlogfileName(basename_, &now);
         time_t start = now - now%Daypreseconds;
 
         lastRoll_ = now;
@@ -56,7 +58,7 @@ namespace detail{
     }
 
     std::string
-    logfile::getLogFileName(const string &basename, time_t *now) {
+    logfile::getlogfileName(const std::string &basename, time_t *now) {
         std::string filename;
         filename.reserve(basename.size() + 64); //一点优化 前面的数字定长
         filename = basename;

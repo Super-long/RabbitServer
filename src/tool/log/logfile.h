@@ -25,9 +25,9 @@ public:
 private:
     void append_unlocked(const char* logline, int len);
 
-    static string getLogFileName(const string& basename, time_t* now);
+    static std::string getlogfileName(const std::string& basename, time_t* now);
 
-    const string basename_;
+    const std::string basename_;
     const off_t rollSize_;
     const int flushInterval_;
     const int checkEveryN_;
