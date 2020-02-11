@@ -1,13 +1,13 @@
 #include <unistd.h>
-#include "tool/log/logfile.h"
 #include "tool/log/logging.h"
+#include "tool/log/logfile.h"
 #include <bits/stdc++.h>
 using namespace std;
 
 /**
  * 通过修改标准输出来达到导出logging的日志
  * @ 可优化
- * @ 1.logging对象改为单例
+ * @ 1.logging对象改为单例 
  * @ 2.异步日志改为unordermap
  * @ 3.把所有的日志放到一个文件夹中
  * @ getlogfileName,获取线程号两点后来记得加
@@ -34,9 +34,9 @@ int main(int argc, char* argv[])
   ws::detail::logging::setFlush(flushFunc); 
   std::string line = "1234567890 abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
 
-  for (int i = 0; i < 10; ++i)
+  for (int i = 0; i < 10000; ++i)
   {
-    ws::detail::LOG_INFO << line << i << ":";
+    ws::detail::log_INFO(__FILE__, __LINE__, errno).stream() << line << i << ":" << "\n";
 
     usleep(1000);
   } 

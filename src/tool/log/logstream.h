@@ -70,7 +70,7 @@ namespace detail{
         void resetBuffer() { buffer_.reset(); }
 
     private:
-        Buffer buffer_;
+        Buffer buffer_; 
         constexpr const static int kMaxNumericSize = 32;
 
         template<typename T>

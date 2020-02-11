@@ -56,7 +56,7 @@ namespace detail{
         startOfPeriod_ = start;
         file_.reset(new FileAppend(filename));
     }
-
+ 
     std::string
     logfile::getlogfileName(const std::string &basename, time_t *now) {
         std::string filename;
@@ -71,9 +71,9 @@ namespace detail{
         filename += timebuf;
 
         // TODO filename += hostname
-        char pidbuf[32];
+        char pidbuf[32] = {0};
         // TODO snprintf(pidbuf, sizeof pidbuf, ".%d", ProcessInfo::pid());
-        filename += pidbuf;
+        //filename += pidbuf;
 
         filename += ".log";
 
@@ -102,6 +102,7 @@ namespace detail{
             }
         }
     }
+    
 }
 
 }

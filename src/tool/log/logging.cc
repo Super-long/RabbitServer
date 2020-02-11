@@ -1,7 +1,6 @@
 #include "logging.h"
 
 #include <errno.h>
-#include <string.h>
 #include <cstdio>
 #include <stdlib.h>
 #include <sstream>
@@ -104,14 +103,15 @@ logging::logging(Filewrapper file, int line, bool toAbort)
     : wrapper_(toAbort?FATAL:ERROR, errno, file, line){}
 
 logging::~logging(){
-    wrapper_.finish();
+    //TODO
+/*     wrapper_.finish();
     const logstream::Buffer& buf(stream().buffer());
     g_output_(buf.data(), buf.Length());
     
     if(wrapper_.level_ == FATAL){
         g_flush_();
         abort();
-    }
+    } */
 }
 
 logging::Funwrapper::Funwrapper(Loglevel level, int old_errno,
@@ -121,7 +121,8 @@ logging::Funwrapper::Funwrapper(Loglevel level, int old_errno,
     level_(level), 
     line_(line),
     basename_(file){
-    formatTime();
+        //TODO 
+/*     formatTime();
     //TODO
     //CurrentThread::tid();
     //stream_ << T(CurrentThread::tidString(), CurrentThread::tidStringLength());
@@ -131,7 +132,7 @@ logging::Funwrapper::Funwrapper(Loglevel level, int old_errno,
     if (old_errno != 0)
     {
         stream_ << strerror_tl(old_errno) << " (errno=" << old_errno << ") ";
-    }
+    } */
 }
 
 void logging::Funwrapper::formatTime() {
@@ -165,9 +166,72 @@ void logging::Funwrapper::formatTime() {
 }
 
 void logging::Funwrapper::finish(){
-    stream_ << " - " << basename_ << ':' << line_ << '\n';
+    stream_ << " - " << basename_ << ':' << line_ << " - ";
+}
+
+template<typename logging::Loglevel LEVEL>
+void
+loggingFactory<LEVEL>::initResourse(logging::Filewrapper file, int line, typename ws::detail::logging::Loglevel level){
+        LogData.reset(new logging(file, line, level));
+    }
+
+template<typename logging::Loglevel LEVEL>
+logging&
+loggingFactory<LEVEL>::getStream(logging::Filewrapper file, int line, int old_errno,  typename ws::detail::logging::Loglevel level){
+ std::call_once(resourse_flag, &loggingFactory::initResourse, this, file, line, level);
+        logstream& Stream = LogData->stream();
+    LogData->wrapper_.time_ = Timestamp::now();
+    LogData->wrapper_.formatTime();
+    //TODO
+    //CurrentThread::tid();
+    //stream_ << T(CurrentThread::tidString(), CurrentThread::tidStringLength());
+    std::string str("111111");
+    Stream << helper(str.c_str(), 6);
+    Stream << helper(LogLevelName[static_cast<size_t>(level)], 6);
+    if (old_errno != 0){
+       Stream << strerror_tl(old_errno) << " (errno=" << old_errno << ") ";
+    } 
+
+    LogData->wrapper_.finish();
+    const logstream::Buffer& buf(LogData->stream().buffer());
+    g_output_(buf.data(), buf.Length());
+    LogData->stream().resetBuffer();
+    
+    if(LogData->wrapper_.level_ == logging::FATAL){
+        g_flush_();
+        abort();
+    }
+    return *LogData;
+}
+
+template<typename logging::Loglevel LEVEL>
+loggingFactory<LEVEL>::~loggingFactory(){
+        const logstream::Buffer& buf(LogData->stream().buffer());
+        g_output_(buf.data(), buf.Length());
+    }
+
+logging& log_DEBUG(logging::Filewrapper file, int line, int olderrno){
+    static loggingFactory<logging::DEBUG> loog;
+    return loog.getStream(file, line, olderrno, logging::DEBUG);
+}
+
+logging& log_INFO(logging::Filewrapper file, int line,int olderrno){
+    static loggingFactory<logging::INFO> loog;
+    return loog.getStream(file, line, olderrno, logging::INFO);
+}
+
+logging& log_WARN(logging::Filewrapper file, int line, int olderrno){
+    static loggingFactory<logging::WARN> loog;
+    return loog.getStream(file, line, olderrno, logging::WARN);
+}
+logging& log_ERROR(logging::Filewrapper file, int line, int olderrno){
+    static loggingFactory<logging::ERROR> loog;
+    return loog.getStream(file, line, olderrno, logging::ERROR);
+}
+logging& log_FATAL(logging::Filewrapper file, int line, int olderrno){
+    static loggingFactory<logging::FATAL> loog;
+    return loog.getStream(file, line, olderrno, logging::FATAL);
 }
 
 }
-
 }
