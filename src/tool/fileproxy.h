@@ -3,8 +3,8 @@
 
 #include"../base/nocopy.h"
 #include"../base/havefd.h"
-#include<sys/stat.h>
-#include<memory>
+#include <sys/stat.h>
+#include <memory>
 #include <unistd.h>
 #include <fcntl.h>
 

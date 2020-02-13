@@ -46,14 +46,20 @@ namespace ws{
 
     int UserBuffer::Write(char* Buf, int bytes){
         if(bytes > Writeable()){
+            Move_Buffer();
+        }
+        if(bytes > Writeable()){
             throw std::out_of_range("'UserBuffer::Write' The parameter is not in the valid range");
         }
         memcpy(Buffer_.get() + Write_Spot, Buf, static_cast<size_t>(bytes));
         Write_Spot += static_cast<size_t>(bytes);
         return bytes;
-    }
+    } 
 
     int UserBuffer::Write(const char* Buf, int bytes){
+        if(bytes > Writeable()){
+            Move_Buffer();
+        }
         if(bytes > Writeable()){
             throw std::out_of_range("'UserBuffer::Write' The parameter is not in the valid range");
         }
@@ -64,6 +70,9 @@ namespace ws{
 
     int UserBuffer::Write(const std::string& str){
         size_t len = str.length();
+        if(len > Writeable()){
+            Move_Buffer();
+        }
         if(len > Writeable()){
             throw std::out_of_range("'UserBuffer::Write' The parameter is not in the valid range");
         }

@@ -20,6 +20,10 @@ public:
         std::swap(T.microseconds, microseconds);
     }
 
+    void swap(Timestamp&& T){
+        std::swap(T.microseconds, microseconds);
+    }
+
     std::string toString() const;
     std::string toFormattedString(bool showMicroseconds = true) const;
 

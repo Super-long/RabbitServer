@@ -104,7 +104,7 @@ private:
     std::once_flag resourse_flag;
 
     void initResourse(logging::Filewrapper file, int line, typename ws::detail::logging::Loglevel level);//{
-
+ 
 public: 
     logging& getStream(logging::Filewrapper file, int line, int olderrno, typename ws::detail::logging::Loglevel level = logging::INFO);
     ~loggingFactory();
