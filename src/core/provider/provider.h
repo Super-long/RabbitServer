@@ -18,7 +18,7 @@ namespace ws{
             int WriteConnection();
             int WriteDate();
             int WriteCRLF();
- 
+  
             int ProvideError();
             int RegularProvide(long Content_Length);
             int RegularProvide(long Content_Length, const char*);
@@ -26,9 +26,8 @@ namespace ws{
             const char* MIME(const char*, ptrdiff_t) const;
             const char* AutoAdapt() const;//用于指定响应数据的类型和编码
             constexpr const char* defaultMIME() const{return "text/html";}
-            bool Good() const {return _Request_->Request_good();}
+            bool Good() const {return _Request_->Request_good();} 
             bool IsFilename(char) const;
-
 
             virtual void provide() = 0;
         protected:

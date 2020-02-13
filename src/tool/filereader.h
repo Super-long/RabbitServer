@@ -5,7 +5,7 @@
 #include<string>  
 
 namespace ws{
-    class FileReader : public FileProxy{
+    class FileReader : public FileProxy{ 
         public:
             explicit FileReader(const char* path) : FileProxy(path){}
             FileReader(const FileProxy& proxy, const char* path) : FileProxy(proxy, path){}

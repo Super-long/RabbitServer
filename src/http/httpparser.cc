@@ -9,7 +9,7 @@ namespace ws{
         Parser_Result = std::make_unique<HttpParser_Content>();
     }
 
-    bool HttpParser::SetRequesting(){
+    bool HttpParser::SetRequesting(){ 
 
         Request_Result->Set_VMajor(Parser_Result->V_major);
         Request_Result->Set_VMinor(Parser_Result->V_minor);
@@ -136,7 +136,7 @@ namespace ws{
                     If_Con_Exe(isheader(ch), HPSHeader, ++(Parser_Result->Header_length););
                     If_Conversion(ch == ':', HPSColon);
                     Set_Fault(HPFInvaildHeader);
-                case HPSColon:
+                case HPSColon: 
 
                     If_Conversion(ch == ' ', HPSColon);
                     If_Con_Exe(isvalue(ch), HPSHeader_Value, Parser_Result->Value = User_Buffer_->ReadPtr(););
@@ -147,7 +147,6 @@ namespace ws{
                     Set_Fault(HPFInvaildHeader_Value);
                 case HPSStore_Header: 
                 {
-                    
                     ParsedHeader _Header_{Parser_Result->Header, Parser_Result->Header_length};
                     ParsedHeader _Value_ {Parser_Result->Value, Parser_Result->Value_length};
                     Request_Result->Store_Header(_Header_,_Value_);

@@ -11,7 +11,7 @@
 #include"../http/httpparser.h"
 #include"contentprovide.h"
 #include"../net/writeloop.h"
-
+ 
 namespace ws{
     class Member : public Nocopy,public Havefd{
         public:
@@ -24,12 +24,14 @@ namespace ws{
             long TimeSpot() const { return Time_Spot; }
             void Touch(long Time_) { Time_Spot = Time_; }
 
-            void DoRead();
+            void DoRead(); 
             void DoWrite(); 
-            bool CloseAble() const;
+            bool CloseAble() const; 
 
             int fd() const final{return Socket_Ptr->fd();} 
             void Init(); 
+
+            ~Member() {Socket_Ptr->Close();}
         private:
             std::unique_ptr<HttpParser> Http_Parser_;
             std::shared_ptr<HttpRequest> Http_Request_;
@@ -41,6 +43,5 @@ namespace ws{
             long Time_Spot;
     };
 }
-
 
 #endif 

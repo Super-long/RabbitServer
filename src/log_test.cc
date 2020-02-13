@@ -34,10 +34,10 @@ int main(int argc, char* argv[])
   ws::detail::logging::setFlush(flushFunc); 
   std::string line = "1234567890 abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
 
-  for (int i = 0; i < 10000; ++i)
+  for (int i = 0; i < 2000000; ++i)
   {
     ws::detail::log_INFO(__FILE__, __LINE__, errno).stream() << line << i << ":" << "\n";
 
-    usleep(1000);
+    //usleep(1000);
   } 
 }

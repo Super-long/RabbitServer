@@ -19,8 +19,8 @@ namespace ws{
             sent_ += ans;
         }
         User_Buffer_->read(sent_);
-        int Remaining = length - sent_;
-        if(Remaining < 0){
+        int Remaining = length - sent_; 
+        if(Remaining > 0){
             InsertSend(Remaining);
             return false;
         }

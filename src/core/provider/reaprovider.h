@@ -14,7 +14,7 @@ namespace ws{
         public:
             REAProvider(std::shared_ptr<HttpRequest> Hr,
                         std::shared_ptr<WriteLoop> Wl) : 
-                        Provider(Hr, Wl){} 
+                        Provider(Hr, Wl){}
             void provide() final;
         private:
             bool FileProvider(std::shared_ptr<FileReader>& file);

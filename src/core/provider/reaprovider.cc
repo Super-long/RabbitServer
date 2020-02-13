@@ -3,13 +3,15 @@
 #include"../../tool/filereader.h"
 #include"../../http/httpstatus.h"
 
+#include <string>
+
 namespace ws{
 
     void REAProvider::provide(){ 
         std::shared_ptr<FileReader> file = nullptr;
         bool cond = FileProvider(file);
         if(cond){
-            int ret = RegularProvide(file->FileSize());
+            int ret = RegularProvide(file->FileSize()); 
             ret += WriteCRLF();
             _Write_Loop_->AddSend(ret);
             _Write_Loop_->AddSendFile(file);
@@ -21,31 +23,31 @@ namespace ws{
     }
 
     bool REAProvider::FileProvider(std::shared_ptr<FileReader>& file){
+
         if(!Good()){
-            std::cout << _Request_->Return_Flag() << std::endl;
             _Request_->Set_StatusCode(HSCBadRequest);
             return false;
         }
 
         auto x = _Request_->Get_Value(static_cast<ParsedHeader>("Host"));
-        std::unique_ptr<char[]> ptr1(new char(x.Readable()));
-        auto release_ptr1 = ptr1.release();
-        memcpy(release_ptr1, x.ReadPtr() , x.Readable());
+        std::string str(x.ReadPtr(), x.Readable()+1);
+        str[x.Readable()] = '\0';
 
         auto y = _Request_->Return_Uri();
-        std::unique_ptr<char[]> ptr2(new char(y.Readable()));
+        std::unique_ptr<char[]> ptr2(new char(y.Readable()+1));
         auto release_ptr2 = ptr2.release();
         memcpy(release_ptr2, y.ReadPtr(), y.Readable());
+        release_ptr2[y.Readable()] = '\0';
 
 /*         file = std::make_shared<FileReader>   
         (static_cast<FileProxy>(_Request_->Get_Value(static_cast<ParsedHeader>("Host")).ReadPtr())
         , _Request_->Return_Uri().ReadPtr());  */
 
         file = std::make_shared<FileReader>   
-        (static_cast<FileProxy>(release_ptr1)
+        (static_cast<FileProxy>(str.c_str())
         , release_ptr2);
 
-        if(!file->Fd_Good() || file->IsTextFile()){
+        if(!file->Fd_Good() || file->IsTextFile()){ 
             _Request_->Set_StatusCode(HSCForbidden); 
             return false;
         }

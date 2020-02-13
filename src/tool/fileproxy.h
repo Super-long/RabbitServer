@@ -7,13 +7,15 @@
 #include <memory>
 #include <unistd.h>
 #include <fcntl.h>
+#include <errno.h>
+#include<iostream>
 
 namespace ws{
 
-    class FileProxy: public Nocopy, public Havefd{
+    class FileProxy: public Nocopy, public Havefd{ 
         public:
             explicit FileProxy(const char* path) : File_Description(::open(path, O_RDONLY)){}
-            FileProxy(const FileProxy&, const char*);
+            FileProxy(const FileProxy&, const char*); 
             ~FileProxy() override;
 
             int fd() const noexcept final {return File_Description;}

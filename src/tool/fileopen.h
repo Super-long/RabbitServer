@@ -12,10 +12,11 @@ private:
     int File_Description;
     constexpr const static char* prevent_busyloop = "/dev/null";
 public:
+    //https://blog.csdn.net/wdzxl198/article/details/6876879
     fileopen() : File_Description(::open(prevent_busyloop, O_RDONLY | O_CREAT | O_EXCL)){}
 
     void Close(){
-        std::lock_guard<std::mutex> guard(mutex_); //是会慢 但一定不会错
+        std::lock_guard<std::mutex> guard(mutex_); //It will be slow, but it must not ne wrong.
         ::close(File_Description);
     }
 

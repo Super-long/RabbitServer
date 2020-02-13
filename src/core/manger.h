@@ -11,8 +11,8 @@
 #include"../tool/timing_wheel.h"
 
 namespace ws{
-    class Manger : public Copyable{
-        using Fun = std::function<int(int)>;
+    class Manger : public Copyable{ 
+        using Fun = std::function<int(int)>; 
         public:
             explicit Manger(Epoll& _epoll) :
             _Epoll_(_epoll), Timer_Wheel_(std::make_unique<TimerWheel>()){}
@@ -25,7 +25,7 @@ namespace ws{
             //Signal driven when used.
             void TimeWheel(int fd);
 
-            void Reading(int fd, long time = -1); 
+            void Reading(int fd, long time = -1);
             void Writing(int fd, long time = -1);
             int JudgeToClose(int fd);
             int Update(int fd);

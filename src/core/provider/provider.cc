@@ -70,7 +70,7 @@ namespace ws{
     }
 
     int Provider::ProvideError(){
-        static constexpr const char temp[] = "<html><head><title>Transgate/HTTP Error</title></head>";
+        static constexpr const char temp[] = "<html><head><title>Dragon/HTTP Error</title></head>";
         size_t len = strlen(temp);
         _Request_->Set_StatusCode(HSCBadRequest);
         int ret = RegularProvide(len - 1);

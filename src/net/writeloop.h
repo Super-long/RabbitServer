@@ -1,7 +1,6 @@
 #ifndef WRITELOOP_H_
 #define WRITELOOP_H_
 
-
 #include"../base/nocopy.h"
 #include"../tool/userbuffer.h"
 #include"../base/havefd.h"
@@ -29,7 +28,7 @@ namespace ws{
             void Move_Buffer() {User_Buffer_->Move_Buffer();}
             size_t WSpot() const noexcept {return User_Buffer_->WSpot();}
             void Rewrite(int spot) noexcept {return User_Buffer_->ReWirte(spot);}
-
+ 
             void AddTask(int len){Que.emplace_back([this, len]{return Send(len);});}
             void AddTask() {AddTask(User_Buffer_->Readable());}
              
@@ -38,11 +37,11 @@ namespace ws{
             void AddSendFile(std::shared_ptr<FileReader> ptr){Que.emplace_back([this, ptr]{return SendFile(ptr);});}
 
             bool DoFirst();
-            bool DoAll(){while(DoFirst());}
+            bool DoAll(){while(DoFirst());} //可能阻塞
 
         private:
             std::unique_ptr<UserBuffer> User_Buffer_; 
-            std::deque<Task> Que;
+            std::deque<Task> Que; //支持长连接
             int fd_;
  
             bool Send(int length);
@@ -51,11 +50,5 @@ namespace ws{
             void InsertSendFile(const std::shared_ptr<FileReader>& ptr) {Que.emplace_back([this, ptr]{return SendFile(ptr);});}
     };
 }
-
-
-
-
-
-
 
 #endif 

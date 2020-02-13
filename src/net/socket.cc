@@ -1,12 +1,14 @@
-#include"socket.h"
-#include<errno.h>
+#include "socket.h"
+#include <errno.h>
+
+#include <iostream>
 
 namespace ws{
     int Socket::Close(){
         int rv = ::close(Socket_fd_);
         if(rv != -1) Have_Close_ = false;
         return rv;
-    }
+    } 
 
     int Socket::SetNoblocking(int flag){
         int old_option = fcntl(Socket_fd_,F_GETFL);
@@ -16,7 +18,7 @@ namespace ws{
     } 
 
     int Socket::Read(std::shared_ptr<UserBuffer> ptr, int length, int flag){
-
+ 
         if(length == -1 || length > ptr->Writeable()){  
             length = ptr->Writeable();
         }
@@ -24,15 +26,20 @@ namespace ws{
         ssize_t sum = 0;
         ssize_t ret = 0;
         while(true){
+            std::cout << "errno : " << errno << std::endl;
             ret = recv(Socket_fd_,ptr->WritePtr(),static_cast<size_t>(length),flag);
             //ret = read(Socket_fd_,ptr->WritePtr(),static_cast<size_t>(length));
-            if(ret != -1){
+            if(ret != -1){ 
                 sum += ret;
                 ptr->Write(ret);
-            }else if(ret < 0){//&& errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR
-                break;
+            }else if(ret < 0 ){ //errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR        
+                if(errno == EWOULDBLOCK || errno == EAGAIN)
+                    break;
+                else if(errno == EINTR)
+                    continue;
             }
-        } 
+        }
+        std::cout << "recv : " << sum << std::endl; 
         return static_cast<int>(sum);
     }
 

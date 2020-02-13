@@ -6,7 +6,7 @@
 #include<sys/epoll.h>
 #include<initializer_list>
  
-namespace ws{
+namespace ws{ 
     enum EpollEventType{
         EETCOULDREAD  = ::EPOLLIN,
         EETCOULDWRITE = ::EPOLLOUT,
@@ -40,7 +40,7 @@ namespace ws{
             }
             epoll_event* Return_Pointer()noexcept {return &event_;}
             int Return_fd()const noexcept {return event_.data.fd;}
-            uint32_t Return_EET()const noexcept{return event_.events;}
+            uint32_t Return_EET()const noexcept {return event_.events;}
         private:
             epoll_event event_;
     };

@@ -15,7 +15,7 @@ namespace ws{
     }
 
     Web_Server::Web_Server() : _Epoll_(), _Manger_(_Epoll_), _Server_(Y_Dragon::MyPort()){}
-
+ 
     void Web_Server::Running(){ 
         try{
             signal(SIGPIPE, SIG_IGN);
@@ -32,8 +32,9 @@ namespace ws{
                     int id = item.Return_fd();
 
                     if(id == _Server_.fd()){
-                        _Server_.Server_Accept([this](int fd){_Manger_.Opera_Member(std::make_unique<Member>(fd),EpollCanRead());});
-                        _Epoll_.Modify(_Server_, EpollCanRead());
+                        if(_Server_.Server_Accept([this](int fd){_Manger_.Opera_Member(std::make_unique<Member>(fd),EpollCanRead());}))
+                            _Epoll_.Modify(_Server_, EpollCanRead());
+                        else continue;
                     }else if(item.check(EETRDHUP)){
                         _Manger_.Remove(id);
                     }else if(item.check(EETCOULDREAD)){

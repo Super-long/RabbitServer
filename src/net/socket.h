@@ -6,7 +6,7 @@
 #include"../base/copyable.h"
 #include"../tool/userbuffer.h"
 
-#include<sys/epoll.h>
+#include<sys/epoll.h> 
 #include<sys/socket.h>
 #include<memory>
 #include<unistd.h>
@@ -25,6 +25,9 @@ namespace ws{
             virtual ~Socket() {if(Have_Close_) ::close(Socket_fd_);}
             
             int Close(); 
+            int Shutdown() {return ::shutdown(Socket_fd_, SHUT_RDWR);}
+            int ShutdownWrite() {return ::shutdown(Socket_fd_, SHUT_WR);}
+            int ShutdownRead() {return ::shutdown(Socket_fd_, SHUT_RD);}
             
             int fd() const noexcept override {return Socket_fd_; }
             int SetNoblocking(int flag = 0);

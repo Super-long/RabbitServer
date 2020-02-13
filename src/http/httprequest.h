@@ -11,9 +11,11 @@ namespace ws{
 
     class HttpRequest : public Nocopy{
         public:
-            HttpRequest() = default;
+            HttpRequest(){
+                Header_Value.reserve(10);
+            };
             //
-            void Set_VMajor(int ma){ Version_Major = ma;}
+            void Set_VMajor(int ma){ Version_Major = ma;} 
             void Set_VMinor(int mi){ Version_Minor = mi;}
             void Set_CStart(const char* ptr){ Content_Start = ptr;}
             void Set_CLength(size_t len){ Content_Length = len;}
@@ -41,12 +43,14 @@ namespace ws{
 
             ParsedHeader& Return_Uri(){return Uri_;}
             std::shared_ptr<UserBuffer> Return_RBuffer(){return Request_Buffer_;}
-            //The above is the return of the base data.
+            //The above is the return of the base data. 
 
             void Store_Header(const ParsedHeader&, const ParsedHeader&);
             ParsedHeader Get_Value(const ParsedHeader&) const;
 
-            bool Request_good() const{return Fault_ == HPFContent;}
+            bool Request_good() const{
+                //std::cout <<  "Fault " << Fault_  << std::endl; 
+                return Fault_ == HPFContent;}
 
         private:
             int Version_Major;
@@ -56,10 +60,10 @@ namespace ws{
 
             HttpStatusCode StatusCode_;
             HttpRequestMethod Method_;
-            HttpFlag Flag_;
+            HttpFlag Flag_; 
             HttpParserFault Fault_;
             
-            ParsedHeader Uri_;
+            ParsedHeader Uri_; 
             std::shared_ptr<UserBuffer> Request_Buffer_;
             std::unordered_map<ParsedHeader,ParsedHeader,ParseHeaderHash> Header_Value;
     };
