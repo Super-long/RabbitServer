@@ -1,5 +1,5 @@
-#include"httprequest.h"
-#include<algorithm>
+#include "httprequest.h"
+#include <algorithm>
 
 namespace ws{
     void HttpRequest::Store_Header(const ParsedHeader& header, const ParsedHeader& value){

@@ -1,12 +1,12 @@
  #ifndef CONTENTPROVIDER_H_
  #define CONTENTPROVIDER_H_
 
-#include"../base/nocopy.h"
-#include"../net/writeloop.h"
-#include"../http/httprequest.h"
-#include"provider/provider.h"
-#include"provider/reaprovider.h"
-#include<memory>
+#include "../base/nocopy.h"
+#include "../net/writeloop.h"
+#include "../http/httprequest.h"
+#include "provider/provider.h"
+#include "provider/reaprovider.h"
+#include <memory>
 
 namespace ws{
 

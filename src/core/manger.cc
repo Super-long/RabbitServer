@@ -1,7 +1,7 @@
-#include"manger.h"
-#include"../net/epoll_event.h"
-#include<functional>
-#include<sys/socket.h>
+#include "manger.h"
+#include "../net/epoll_event.h"
+#include <functional>
+#include <sys/socket.h>
 
 namespace ws{
     int Manger::Opera_Member(std::unique_ptr<Member>& ptr,EpollEventType& EE){

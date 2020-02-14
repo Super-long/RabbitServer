@@ -1,14 +1,14 @@
 #ifndef FILEPROXY_H_
 #define FILEPROXY_H_
 
-#include"../base/nocopy.h"
-#include"../base/havefd.h"
+#include "../base/nocopy.h"
+#include "../base/havefd.h"
 #include <sys/stat.h>
 #include <memory>
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
-#include<iostream>
+#include <iostream>
 
 namespace ws{
 
@@ -29,11 +29,6 @@ namespace ws{
             void Statget();
     };
 
-
-
 }
-
-
-
 
 #endif

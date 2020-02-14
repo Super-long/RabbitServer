@@ -16,7 +16,7 @@ namespace ws{
             explicit Server(int port) : Addr_(std::make_unique<Address>(port)),FileOpen(){}
 
             std::unique_ptr<Socket> Server_Accept();
-            bool Server_Accept(fun&& f);
+            void Server_Accept(fun&& f);
             void Server_BindAndListen();  
 
             int Set_AddrRUseA() {return Set_Socket(SO_REUSEADDR);}

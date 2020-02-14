@@ -1,14 +1,14 @@
 #ifndef WRITELOOP_H_
 #define WRITELOOP_H_
 
-#include"../base/nocopy.h"
-#include"../tool/userbuffer.h"
-#include"../base/havefd.h"
-#include"../tool/filereader.h"
-#include<deque>
-#include<memory>
-#include<string>
-#include<functional>
+#include "../base/nocopy.h"
+#include "../tool/userbuffer.h"
+#include "../base/havefd.h"
+#include "../tool/filereader.h"
+#include <deque>
+#include <memory>
+#include <string>
+#include <functional>
 
 namespace ws{
 
@@ -37,7 +37,9 @@ namespace ws{
             void AddSendFile(std::shared_ptr<FileReader> ptr){Que.emplace_back([this, ptr]{return SendFile(ptr);});}
 
             bool DoFirst();
-            bool DoAll(){while(DoFirst());} //可能阻塞
+            bool DoAll(){
+                std::cout << "发送消息\n";
+                while(DoFirst());} //可能阻塞
 
         private:
             std::unique_ptr<UserBuffer> User_Buffer_; 

@@ -1,6 +1,6 @@
-#include"../../base/Y_Dragon.h" 
-#include"provider.h"
-#include"../../http/httpstatus.h"
+#include "../../base/Y_Dragon.h" 
+#include "provider.h"
+#include "../../http/httpstatus.h"
 
 namespace ws{
     bool Provider::IsFilename(char x) const {
@@ -27,8 +27,8 @@ namespace ws{
     }
 
     int Provider::WriteConnection(){
-        return _Write_Loop_->swrite("Connection", 
-        _Request_->Return_Flag() == Keep_Alive ? "Keep-alive" : "Close");
+        return _Write_Loop_->swrite("Connection: %s", 
+        _Request_->Return_Flag() == Keep_Alive ? "Keep-alive\n" : "Close\n");
     }
 
     int Provider::WriteCRLF(){
@@ -39,9 +39,9 @@ namespace ws{
         int ret = WriteHead(_Request_->Return_Version_Ma(),_Request_->Return_Version_Mi(),
         _Request_->Return_Statuscode());
         ret += WriteDate();
-        ret += WriteConnection();
-        ret += WriteItem("Content-Type", Content_Type);
-        ret += WriteItem("Content-Length", std::to_string(Content_Length).c_str());
+        ret += WriteConnection(); 
+        ret += WriteItem("Content-Type: %s", Content_Type); //类型未完成
+        ret += WriteItem("Content-Length %s", std::to_string(Content_Length).c_str());
         return ret;
     }
 
@@ -57,7 +57,10 @@ namespace ws{
                 End = Start;
             }
         }
-        return Start == temp ? defaultMIME() : MIME(Start, std::distance(Start, End));
+        //TODO 类型修改
+        //if(Start == temp) std::cout << "defaultmime\n";
+        //return Start == temp ? defaultMIME() : MIME(Start, std::distance(Start, End));
+        return defaultMIME();
     }
 
     int Provider::RegularProvide(long Content_Length){

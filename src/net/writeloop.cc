@@ -1,6 +1,6 @@
-#include"writeloop.h"
-#include<cstdarg>
-#include<sys/socket.h>
+#include "writeloop.h"
+#include <cstdarg>
+#include <sys/socket.h>
 
 namespace ws{
     int WriteLoop::swrite(const char* format, ...){

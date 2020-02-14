@@ -1,7 +1,7 @@
 #ifndef NEW_HANDLER_H_
 #define NEW_HANDLER_H_
 
-#include<new>
+#include <new>
 
 //typedef void (*new_handler)();
 

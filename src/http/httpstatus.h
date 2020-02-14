@@ -1,7 +1,7 @@
 #ifndef HTTPSTATUS_H_
 #define HTTPSTATUS_H_
 
-#include<iostream>
+#include <iostream>
 
 namespace ws{
 
@@ -230,7 +230,5 @@ namespace ws{
     return (c >= 0) ? isvalue[c] : false;
     }
 }
-
-
 
 #endif

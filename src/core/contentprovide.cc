@@ -1,5 +1,5 @@
-#include"contentprovide.h"
-#include"provider/reaprovider.h"
+#include "contentprovide.h"
+#include "provider/reaprovider.h"
  
 namespace ws{
 

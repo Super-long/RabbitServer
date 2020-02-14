@@ -1,6 +1,6 @@
-#include"member.h"
-#include"../tool/userbuffer.h"
-#include<memory>
+#include "member.h"
+#include "../tool/userbuffer.h"
+#include <memory>
 
 namespace ws{
     void Member::DoRead(){

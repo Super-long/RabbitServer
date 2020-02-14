@@ -1,7 +1,7 @@
-#include"reaprovider.h"
-#include"../../tool/parsed_header.h"
-#include"../../tool/filereader.h"
-#include"../../http/httpstatus.h"
+#include "reaprovider.h"
+#include "../../tool/parsed_header.h"
+#include "../../tool/filereader.h"
+#include "../../http/httpstatus.h"
 
 #include <string>
 
@@ -15,7 +15,7 @@ namespace ws{
             ret += WriteCRLF();
             _Write_Loop_->AddSend(ret);
             _Write_Loop_->AddSendFile(file);
-            ret = WriteCRLF();
+            ret = WriteCRLF(); 
             _Write_Loop_->AddSend(ret);
         }else{
             ProvideError();
