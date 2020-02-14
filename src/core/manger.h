@@ -14,7 +14,7 @@ namespace ws{
     class Manger : public Copyable{ 
         using Fun = std::function<int(int)>; 
         public:
-            explicit Manger(Epoll& _epoll) :
+            explicit Manger(Epoll& _epoll) : 
             _Epoll_(_epoll), Timer_Wheel_(std::make_unique<TimerWheel>()){}
 
             int Opera_Member(std::unique_ptr<Member>&, EpollEventType&);

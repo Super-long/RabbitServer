@@ -4,9 +4,11 @@
 #include <thread>
 #include <assert.h>
 
+#include "../base/nocopy.h"
+
 namespace ws{
 
-class EventLoop{
+class EventLoop : public Nocopy {
 private:
 bool looping;
 const std::thread::id threadID;

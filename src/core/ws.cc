@@ -5,6 +5,8 @@
 #include<sys/time.h>
 #include"ws.h"
 
+#include <iostream>
+
 namespace ws{
 
     int64_t Get_Current_Time(){
@@ -24,6 +26,9 @@ namespace ws{
             _Epoll_.Add(_Server_, EpollCanRead());
             EpollEvent_Result Event_Reault(Y_Dragon::EventResult_Number());
 
+            channel_helper Channel_;
+            Channel_.loop();
+
             while(true){
                 //constexpr int Second = 20;
                 _Epoll_.Epoll_Wait(Event_Reault);
@@ -31,18 +36,11 @@ namespace ws{
                     auto & item = Event_Reault[i];
                     int id = item.Return_fd();
 
-                    if(id == _Server_.fd()){
-                        if(_Server_.Server_Accept([this](int fd){_Manger_.Opera_Member(std::make_unique<Member>(fd),EpollCanRead());}))
-                            _Epoll_.Modify(_Server_, EpollCanRead());
-                        else continue;
-                    }else if(item.check(EETRDHUP)){
-                        _Manger_.Remove(id);
-                    }else if(item.check(EETCOULDREAD)){
-                        _Manger_.Reading(id);
-                        _Manger_.JudgeToClose(id);
-                    } 
+                    if(id == _Server_.fd()){ //这里放入事件循环
+                        _Server_.Server_Accept([&](int fd){Channel_.Distribution(fd);});
+                        _Epoll_.Modify(_Server_, EpollCanRead());
+                    }
                 }
-                //TODO : Using Time wheel
             }
         } catch (std::exception& err){
             std::cout << err.what() << std::endl;
