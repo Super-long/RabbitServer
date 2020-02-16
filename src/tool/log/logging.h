@@ -56,7 +56,7 @@ public:
     logging(Filewrapper file, int line, logging::Loglevel level);
     logging(Filewrapper file, int line, Loglevel level, const char* str);
     logging(Filewrapper file, int line, bool toAbort);
-    ~logging(); 
+    ~logging();  
 
     logstream& stream() { return wrapper_.stream_; }
 
@@ -116,7 +116,7 @@ logging& log_WARN(logging::Filewrapper file, int line, int olderrno);
 logging& log_ERROR(logging::Filewrapper file, int line, int olderrno);
 logging& log_FATAL(logging::Filewrapper file, int line, int olderrno);
 
-}
+} 
 
 }
 

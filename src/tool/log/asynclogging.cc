@@ -62,7 +62,7 @@ AsyncLogging::AsyncFunc(){
     WriteLog.reserve(16);
     auto interval = std::chrono::seconds(flushInterval_);
 
-    while(running){
+    while(running){ 
         {
           std::unique_lock<std::mutex> guard(mutex_);
           if(buffers_.empty()){

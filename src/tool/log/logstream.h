@@ -69,6 +69,7 @@ namespace detail{
         const Buffer& buffer() const { return buffer_; }
         void resetBuffer() { buffer_.reset(); }
 
+
     private:
         Buffer buffer_; 
         constexpr const static int kMaxNumericSize = 32;

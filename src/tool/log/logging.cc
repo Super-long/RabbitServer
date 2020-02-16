@@ -180,6 +180,7 @@ logging&
 loggingFactory<LEVEL>::getStream(logging::Filewrapper file, int line, int old_errno,  typename ws::detail::logging::Loglevel level){
  std::call_once(resourse_flag, &loggingFactory::initResourse, this, file, line, level);
         logstream& Stream = LogData->stream();
+        
     LogData->wrapper_.time_.swap(Timestamp::now());
     LogData->wrapper_.formatTime();
     //TODO
@@ -197,7 +198,7 @@ loggingFactory<LEVEL>::getStream(logging::Filewrapper file, int line, int old_er
     g_output_(buf.data(), buf.Length());
     LogData->stream().resetBuffer();
     
-    if(LogData->wrapper_.level_ == logging::FATAL){
+    if(LogData->wrapper_.level_ == logging::FATAL){ 
         g_flush_();
         abort();
     }
@@ -207,6 +208,7 @@ loggingFactory<LEVEL>::getStream(logging::Filewrapper file, int line, int old_er
 template<typename logging::Loglevel LEVEL>
 loggingFactory<LEVEL>::~loggingFactory(){
         const logstream::Buffer& buf(LogData->stream().buffer());
+        cout << "buffer ok\n";
         g_output_(buf.data(), buf.Length());
     }
 

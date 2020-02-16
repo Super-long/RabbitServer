@@ -9,7 +9,7 @@
 #include <condition_variable>
 #include "../../base/nocopy.h"
 #include "Fixedbuffer.h"
- 
+  
 namespace ws{
 
 namespace detail{
