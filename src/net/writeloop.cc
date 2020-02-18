@@ -36,7 +36,7 @@ namespace ws{
     WriteLoop::COMPLETETYPE WriteLoop::SendFile(std::shared_ptr<FileReader> ptr){
         ssize_t len = 0;
         while(len = ptr->SendFile(fd_) && len > 0){}
-        if(ptr->Send_End()){
+        if(!ptr->Send_End()){
             InsertSendFile(ptr);
             return IMCOMPLETE;
         }
@@ -53,12 +53,10 @@ namespace ws{
     }
 
     WriteLoop::COMPLETETYPE WriteLoop::DoAll(){
-        std::cout << "发送消息\n";
         while(1){
-            auto CompleteType = DoFirst(); //TODO 返回零 记得改
-            std::cout << "CompleteType = " << CompleteType << std::endl;
+            auto CompleteType = DoFirst();
             if(CompleteType == COMPLETE) continue;
-            else return EMPTY; //TODO 先测试 
+            else return CompleteType;
         }
     }
 

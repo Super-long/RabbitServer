@@ -7,7 +7,7 @@
 #include "httpstatus.h"
 #include <memory>
 
-namespace ws{
+namespace ws{ 
 
     class HttpParser : public Nocopy{ 
         public: 

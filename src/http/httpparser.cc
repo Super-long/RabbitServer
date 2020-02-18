@@ -27,10 +27,10 @@ namespace ws{
 
     }
 
-    HttpParserFault HttpParser::Starting_Parser(){
+    HttpParserFault HttpParser::Starting_Parser(){ 
         if(!Parser_able()){
             Parser_Result->Fault = HPFToLittleMessage;
-        }
+        } 
         
         Parsering();
         //std::cout << *Parser_Result << std::endl; //TODO : For debugging

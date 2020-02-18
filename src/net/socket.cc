@@ -40,7 +40,7 @@ namespace ws{
                 else if(errno == EINTR)
                     continue;
             }
-        }
+        } 
         std::cout << "recv : " << sum << std::endl; 
         return static_cast<int>(sum);
     }

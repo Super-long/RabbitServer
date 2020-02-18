@@ -36,7 +36,7 @@ namespace ws{
             int SetNoblockingCLOEXEC(){
                 return Socket::SetNoblocking(O_CLOEXEC); 
             }
-            int SetNoDelay(); //Forbid Nagle.
+            int SetNoDelay(); //Forbid Nagle. 
             int SetKeepAlive();
 
             int Read(char* Buffer, int Length, int flag = 0);

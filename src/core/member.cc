@@ -16,8 +16,6 @@ namespace ws{
         }
         if( Write_Loop_->DoAll() != WriteLoop::IMCOMPLETE){
             WriteComplete = true;
-            if(WriteComplete) std::cout << "Doall : true\n";
-            else std::cout << "Doall : fasle\n";
         }
     } 
 
@@ -27,7 +25,6 @@ namespace ws{
         }else{
             WriteComplete = false;
         }
-
     } 
  
     void Member::Init(){ //TODO buffer需要修改
