@@ -44,13 +44,13 @@ private:
     std::vector<std::queue<int>*> store_;
     std::vector<int> eventfd_;
     int RoundRobin = 0;
-    static const uint64_t tool;
+    static const uint64_t tool; //no constexper.//https://www.ojit.com/article/112265
     const unsigned int ThreadNumber = std::thread::hardware_concurrency() - 1;
 public:
     channel_helper() = default;
 
-    void loop();
-
+    void loop(); 
+ 
     void Distribution(int fd);
 };
 

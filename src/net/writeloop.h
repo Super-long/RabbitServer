@@ -13,8 +13,10 @@
 namespace ws{
 
     class WriteLoop : public Nocopy, public Havefd{
-            using Task = std::function<bool()>;
         public:
+            enum COMPLETETYPE {IMCOMPLETE, COMPLETE, EMPTY};
+            using Task = std::function<WriteLoop::COMPLETETYPE()>;
+
             WriteLoop(int fd, int length) : fd_(fd),User_Buffer_(std::make_unique<UserBuffer>(length)){} 
             int fd() const override{return fd_;}
 
@@ -36,18 +38,16 @@ namespace ws{
             void AddSend(){Que.emplace_back([this]{return Send(User_Buffer_->Readable());});}
             void AddSendFile(std::shared_ptr<FileReader> ptr){Que.emplace_back([this, ptr]{return SendFile(ptr);});}
 
-            bool DoFirst();
-            bool DoAll(){
-                std::cout << "发送消息\n";
-                while(DoFirst());} //可能阻塞
-
+            COMPLETETYPE DoFirst();
+            COMPLETETYPE DoAll();
+ 
         private:
             std::unique_ptr<UserBuffer> User_Buffer_; 
             std::deque<Task> Que; //支持长连接
             int fd_;
  
-            bool Send(int length);
-            bool SendFile(std::shared_ptr<FileReader>);
+            COMPLETETYPE Send(int length);
+            COMPLETETYPE SendFile(std::shared_ptr<FileReader>);
             void InsertSend(int len){Que.emplace_front([this,len] {return Send(len);});}
             void InsertSendFile(const std::shared_ptr<FileReader>& ptr) {Que.emplace_back([this, ptr]{return SendFile(ptr);});}
     };

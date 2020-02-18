@@ -9,7 +9,7 @@ void looping(std::promise<std::queue<int>*>& pro, int eventfd){
         pro.set_value(rea.return_ptr());
         rea._Epoll_.Add(rea, EpollCanRead());
         EpollEvent_Result Event_Reault(Y_Dragon::EventResult_Number());
-
+ 
         while(true){
             rea._Epoll_.Epoll_Wait(Event_Reault);
             for(int i = 0; i < Event_Reault.size(); ++i){
@@ -29,8 +29,11 @@ void looping(std::promise<std::queue<int>*>& pro, int eventfd){
                     rea._Manger_.Remove(id);
                 }else if(item.check(EETCOULDREAD)){
                     rea._Manger_.Reading(id);
+                    rea._Manger_.JudgeToClose(id); //修改
+                }else if(item.check(EETCOULDWRITE)){
+                    rea._Manger_.Writing(id);
                     rea._Manger_.JudgeToClose(id);
-                } 
+                }
                 //TODO : Using Time wheel
             }
         }

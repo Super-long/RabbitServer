@@ -208,7 +208,6 @@ loggingFactory<LEVEL>::getStream(logging::Filewrapper file, int line, int old_er
 template<typename logging::Loglevel LEVEL>
 loggingFactory<LEVEL>::~loggingFactory(){
         const logstream::Buffer& buf(LogData->stream().buffer());
-        cout << "buffer ok\n";
         g_output_(buf.data(), buf.Length());
     }
 

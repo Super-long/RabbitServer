@@ -101,7 +101,7 @@ template<typename logging::Loglevel LEVEL>
 class loggingFactory : public Nocopy{
 private:
     std::shared_ptr<logging> LogData;
-    std::once_flag resourse_flag;
+    std::once_flag resourse_flag; 
 
     void initResourse(logging::Filewrapper file, int line, typename ws::detail::logging::Loglevel level);//{
  

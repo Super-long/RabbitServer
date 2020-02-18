@@ -19,7 +19,7 @@ namespace ws{
         return old_option;
     } 
 
-    int Socket::Read(std::shared_ptr<UserBuffer> ptr, int length, int flag){
+    int Socket::Read(std::shared_ptr<UserBuffer> ptr, int length, int flag){ 
  
         if(length == -1 || length > ptr->Writeable()){  
             length = ptr->Writeable();

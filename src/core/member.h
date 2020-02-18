@@ -15,8 +15,8 @@
 namespace ws{
     class Member : public Nocopy,public Havefd{
         public:
-            Member(int fd, long time = -1l) : Socket_Ptr(std::make_unique<Socket>(fd)),Time_Spot(time){Init();}
-            Member(std::unique_ptr<Socket>&& ptr, long time = -1l) : Time_Spot(time){
+            Member(int fd, long time = -1l) : Socket_Ptr(std::make_unique<Socket>(fd)),Time_Spot(time),WriteComplete(false){Init();}
+            Member(std::unique_ptr<Socket>&& ptr, long time = -1l) : Time_Spot(time), WriteComplete(false){
                 Init();
                 std::swap(Socket_Ptr,ptr);
             }
@@ -31,6 +31,8 @@ namespace ws{
             int fd() const final{return Socket_Ptr->fd();} 
             void Init(); 
 
+            bool IsWriteComplete() const noexcept {return WriteComplete;}
+
             ~Member() {Socket_Ptr->Close();}
         private:
             std::unique_ptr<HttpParser> Http_Parser_;
@@ -41,6 +43,7 @@ namespace ws{
             
             std::shared_ptr<UserBuffer> User_Buffer;
             long Time_Spot;
+            bool WriteComplete;
     };
 }
 

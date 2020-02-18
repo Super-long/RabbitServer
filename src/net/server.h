@@ -15,7 +15,7 @@ namespace ws{
             Server(const char* buffer, int port) : Addr_(std::make_unique<Address>(buffer,port)),FileOpen(){}
             explicit Server(int port) : Addr_(std::make_unique<Address>(port)),FileOpen(){}
 
-            std::unique_ptr<Socket> Server_Accept();
+            std::unique_ptr<Socket> Server_Accept(); 
             void Server_Accept(fun&& f);
             void Server_BindAndListen();  
 

@@ -18,7 +18,7 @@ namespace ws{
             Socket() : Socket_fd_(socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, 0)){
                 //SetNoblockingCLOEXEC();
                 SetKeepAlive();
-                SetNoDelay();
+                SetNoDelay(); 
             }
             explicit Socket(int fd) : Socket_fd_(fd){}
             explicit Socket(const Havefd& Hf) : Socket_fd_(Hf.fd()){}

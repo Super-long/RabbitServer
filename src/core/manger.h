@@ -29,6 +29,7 @@ namespace ws{
             void Writing(int fd, long time = -1);
             int JudgeToClose(int fd);
             int Update(int fd);
+            int UpdateWrite(int fd);
 
             int Remove(int fd);
             bool Exist(int fd){if(Fd_To_Member.find(fd) != Fd_To_Member.end()) return true; return false;}
