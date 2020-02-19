@@ -9,10 +9,68 @@
 #include <sys/epoll.h> 
 #include <sys/socket.h>
 #include <memory>
+#include <functional>
+#include <string.h> 
 #include <unistd.h>
 #include <fcntl.h>
 
-namespace ws{ 
+namespace ws{
+
+    class Extrabuf : public Nocopy{
+        enum isvaild {INVAILD = -1, VAILD};
+        public:
+            void init(){
+                extrabuf = std::make_unique<char[]>(4048);
+                ExtrabufPeek = static_cast<int>(VAILD);
+            }
+            char* Get_ptr() const noexcept{
+                return extrabuf.get();
+            }
+
+            int Get_length() const noexcept{
+                return ExtrabufPeek;
+            }
+
+            void Write(int spot) noexcept {
+                ExtrabufPeek = spot;
+            }
+
+            int WriteAble() const noexcept{
+                return BufferSize - ExtrabufPeek;
+            }
+
+            bool IsVaild() const noexcept{
+                return ExtrabufPeek == INVAILD ? false : true;
+                //return static_cast<bool>(ExtrabufPeek);
+            }
+
+            bool Reset(){
+                std::unique_ptr<char[]> TempPtr = std::make_unique<char[]>(BufferSize);
+                memcpy(TempPtr.get(), extrabuf.get(), BufferSize);
+                extrabuf.reset(new char[BufferSize*2]);
+                memcpy(extrabuf.get(), TempPtr.get(), BufferSize);
+                BufferSize*=2;
+            }
+
+            void SetHighWaterMarkCallback_(std::function<void()> fun){
+                highWaterMarkCallback_ = std::move(fun);
+            }
+
+            bool IsExecutehighWaterMark() const noexcept{
+                return Get_length() >= highWaterMark_;
+            }
+
+            void Callback(){
+                if(highWaterMarkCallback_) highWaterMarkCallback_();
+            }
+        private:
+            static const int highWaterMark_ = 64*1024*1024;
+            std::function<void()> highWaterMarkCallback_;
+            std::unique_ptr<char[]> extrabuf = nullptr; 
+            int ExtrabufPeek = static_cast<int>(isvaild::INVAILD);
+            int BufferSize = 4048;
+    };
+
     class Socket : public Havefd,Copyable{
         public:
             Socket() : Socket_fd_(socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, 0)){
@@ -46,6 +104,7 @@ namespace ws{
             //int Read(...)
 
         private:
+            Extrabuf ExtraBuffer_;
             bool Have_Close_ = true;
             int Socket_fd_;
     };
