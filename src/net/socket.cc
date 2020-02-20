@@ -50,6 +50,7 @@ namespace ws{
                 if(!ExtraBuffer_.WriteAble()){ //Extrabuffer is full.
                     if(ExtraBuffer_.IsExecutehighWaterMark()){
                         ExtraBuffer_.Callback();
+                        //return -1;
                         break;
                     }
                     ExtraBuffer_.Reset();
@@ -59,7 +60,7 @@ namespace ws{
             }else if(ret < 0 ){ //errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR        
                 if(errno == EWOULDBLOCK || errno == EAGAIN)
                     break;
-                else if(errno == EINTR)
+                else if(errno == EINTR) 
                     continue;
             }
         } 

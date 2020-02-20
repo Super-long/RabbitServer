@@ -42,7 +42,7 @@ namespace ws{
             std::unique_ptr<ContentProvider> Content_Provider_;
             
             std::shared_ptr<UserBuffer> User_Buffer;
-            long Time_Spot;
+            long Time_Spot; 
             bool WriteComplete;
     };
 }

@@ -102,6 +102,8 @@ namespace ws{
 
             int Write(char* Buffer, int length, int flag = 0);
             //int Read(...)
+            bool IsExtraBuffer() const {return ExtraBuffer_.IsVaild();}
+            Extrabuf& ReturnExtraBuffer() {return ExtraBuffer_;}
 
         private:
             Extrabuf ExtraBuffer_;
@@ -109,5 +111,5 @@ namespace ws{
             int Socket_fd_;
     };
 }
-
+ 
 #endif

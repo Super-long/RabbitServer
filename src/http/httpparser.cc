@@ -182,6 +182,15 @@ namespace ws{
                         break;
             }
             User_Buffer_->read(1);
+            if(User_Buffer_->Readable() == 0 && Extrabuffer_.IsVaild()){ //take out data from extrabuffer.
+                User_Buffer_->Clean();
+                auto length = Extrabuffer_.Get_length();
+                if(length > User_Buffer_->Length()){
+                    length = User_Buffer_->Length();
+                }
+                Extrabuffer_.Write(length + Extrabuffer_.Get_length());
+                User_Buffer_->Write(Extrabuffer_.Get_ptr(), length);
+            }
         }
 
     }
