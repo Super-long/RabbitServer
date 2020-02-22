@@ -5,6 +5,7 @@
 #include <sys/socket.h> //connect
 #include <iostream> //cout endl
 #include <assert.h> //assert
+#include <algorithm> //for_each
 
 namespace ws{
 
@@ -13,10 +14,11 @@ FastCgi::Conection(){
     struct sockaddr_in ServerAddress;
     memset(&ServerAddress, 0, sizeof ServerAddress);
     constexpr char IP[] = "127.0.0.1";
-    
+    assert(socket_.fd() > 0);
+
     ServerAddress.sin_family = AF_INET;
     ServerAddress.sin_addr.s_addr = inet_addr(IP);
-    ServerAddress.sin_port = htons(9000); 
+    ServerAddress.sin_port = htons(9000);
 
     int ret = ::connect(socket_.fd(), (struct sockaddr *)&ServerAddress, sizeof ServerAddress);
     if(ret < 0) {
@@ -26,7 +28,7 @@ FastCgi::Conection(){
 }
 
 FCGI_Header 
-CreateHeader(int type, int request, int contentLength, int paddingLength){
+FastCgi::CreateHeader(int type, int request, int contentLength, int paddingLength){
     FCGI_Header header;
     header.version = FCGI_VERSION_1; //版本一般设置为1
     header.type    = (unsigned char)type; //设置请求类型
@@ -40,7 +42,7 @@ CreateHeader(int type, int request, int contentLength, int paddingLength){
     header.contentLengthB0 = (unsigned char)(contentLength & 0xff); //低八位
     
     header.paddingLength = (unsigned char)paddingLength; //填充字节的长度 保证字节对齐 TODO 查下
-    header.reserved = 0; //保留字节赋为0  
+    header.reserved = 0; //保留字节赋为0 
     return header; //RVO
 }
 
@@ -53,8 +55,7 @@ FastCgi::CreateBeginRequestBody(int role,int keepConnection){
 
     body.flags = (unsigned char)((keepConnection) ? FCGI_KEEP_CONN : 0);//大于0常连接，否则短连接
 
-    bzero(&body.reserved,sizeof(body.reserved));
-
+    memset(&body.reserved, 0 ,sizeof body.reserved);
     return body;
 }
 
@@ -94,7 +95,6 @@ FastCgi::CreateContentValue(const std::string& name, int nameLen, //ContentBuffP
     }
     std::for_each(name.cbegin(), name.cend(), [&](char ch){*ContentBuffPtr++ = ch;});
     std::for_each(value.cbegin(), value.cend(), [&](char ch){*ContentBuffPtr++ = ch;});
-
     *ContentLen = std::distance(StartSpot_Ptr, ContentBuffPtr);
 }
 
@@ -105,15 +105,15 @@ FastCgi::SendContent(const std::string& tag, const std::string& value){
 
     int ContentLength = 0; 
     CreateContentValue(tag, tag.size(), value, value.size(), bodyBuffer, &ContentLength); //得到发送的内容与长度
-    
+
     FCGI_Header ContentHeader(CreateHeader(FCGI_PARAMS, requestId_, ContentLength));
 
     int AllContentLength = ContentLength + FCGI_HEADER_LEN;
     char Content[AllContentLength];
-    memset(Content, 0, AllContentLength*sizeof(char));
+    //memset(Content, 0, AllContentLength*sizeof(char));
 
     memcpy(Content, (char*)&ContentHeader, FCGI_HEADER_LEN);
-    memcpy(Content + FCGI_HEADER_LEN, Content, ContentLength);
+    memcpy(Content + FCGI_HEADER_LEN, bodyBuffer, ContentLength);
 
     int ret = ::write(socket_.fd(), Content, AllContentLength);
     assert(ret == AllContentLength);
@@ -124,7 +124,6 @@ FastCgi::EndRequest(){
     FCGI_Header EndHeader(CreateHeader(FCGI_PARAMS, requestId_, 0));
 
     int ret = ::write(socket_.fd(), (char *)&EndHeader, FCGI_HEADER_LEN);
-    if(ret < 0) return false;
     assert(ret == FCGI_HEADER_LEN);
 
     return true;
@@ -134,14 +133,9 @@ void
 FastCgi::SendRequest(const std::string& data, size_t len){
     FCGI_Header IntervalHead(CreateHeader(FCGI_STDIN, requestId_, len)); //发送的输入
     int ret_IntervalHead = ::send(socket_.fd(), (char*)&IntervalHead, FCGI_HEADER_LEN, 0);
-    assert(ret_IntervalHead == FCGI_HEADER_LEN);
-    
     int ret_Data = ::send(socket_.fd(), data.c_str(), len, 0);
-    assert(ret_Data == len);
-
     FCGI_Header EndHeader(CreateHeader(FCGI_STDIN, requestId_, 0));
     int ret_EndHead = ::send(socket_.fd(), (char*)&EndHeader, FCGI_HEADER_LEN, 0);
-    assert(ret_EndHead == FCGI_HEADER_LEN);
     //网络上的问题目前不太好解决, 消息发送不完全的话就退出
 }
 
@@ -163,7 +157,7 @@ FastCgi::ReadContent(){
             ret = ::read(socket_.fd(), Content, ContentLength); //得到内容
             assert(ret == ContentLength); 
 
-            GetContent(Content); //Content中为HTML格式
+            GetContent(Content); //Content中为HTML格式 TODO 其实不是
 
             if(parsering.paddingLength > 0){
                 ret = read(socket_.fd(), Trash, parsering.paddingLength);
@@ -211,6 +205,35 @@ char* FastCgi::FindStart(char* data){
             return data;
     }
     return NULL;
+}
+
+
+void //传入要请求的路径与输入
+FastCgi::start(const std::string& path, const std::string& data){ 
+    ++requestId_;
+    //连接服务器php-fpm
+    Conection() ;
+    StartRequest() ; //发送初始请求头和请求体 
+    //FCGI_BEGIN_REQUEST
+
+    //设置method 为post
+    //设置script_name变量为php资源路径
+    //设置content-type　文本格式
+    //设置content-length消息长度
+    //将要操作的数据传过去
+    char Length[32] ;
+    sprintf(Length, "%d", data.size()) ;
+    //先发送一个头部 然后在发送消息体 消息体由一个FCGI_Header和消息体在一起.
+    //FCGI_PARAMS
+    SendContent("SCRIPT_FILENAME", path.c_str());
+    SendContent("REQUEST_METHOD", "POST") ;
+    SendContent("CONTENT_LENGTH", Length) ;
+    SendContent("CONTENT_TYPE", "application/x-www-form-urlencoded") ;
+
+    EndRequest() ; //请求头结束
+    //FCGI_PARAMS   
+    //结束发送 发送
+    SendRequest(data.c_str(), data.size());
 }
 
 }
