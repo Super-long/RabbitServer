@@ -10,7 +10,7 @@
 namespace ws{
     class Server : public Socket{ 
             using fun = std::function<void(int)>;
-        public:
+        public: 
             Server(const Address& addr_) : Addr_(std::make_unique<Address>(addr_)),FileOpen(){}
             Server(const char* buffer, int port) : Addr_(std::make_unique<Address>(buffer,port)),FileOpen(){}
             explicit Server(int port) : Addr_(std::make_unique<Address>(port)),FileOpen(){}

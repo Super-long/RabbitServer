@@ -13,7 +13,7 @@ namespace ws{
             void Running();
         private: 
             Manger _Manger_;
-            Epoll _Epoll_;
+            Epoll _Epoll_; 
             Server _Server_; 
     };
 }

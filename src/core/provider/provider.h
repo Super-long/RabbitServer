@@ -28,7 +28,7 @@ namespace ws{
             constexpr const char* defaultMIME() const{return "text/html\n";}
             bool Good() const {return _Request_->Request_good();} 
             bool IsFilename(char) const;
-
+ 
             virtual void provide() = 0;
         protected:
 

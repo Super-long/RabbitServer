@@ -41,7 +41,7 @@ namespace ws{
             HttpFlag Return_Flag() const {return Flag_;}
             HttpParserFault Return_Fault() const {return Fault_;}
 
-            ParsedHeader& Return_Uri(){return Uri_;}
+            ParsedHeader& Return_Uri(){return Uri_;} 
             std::shared_ptr<UserBuffer> Return_RBuffer(){return Request_Buffer_;}
             //The above is the return of the base data. 
 

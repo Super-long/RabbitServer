@@ -12,7 +12,7 @@ namespace ws{
             throw std::invalid_argument("'HttpRequest::GrtValue' No such user.");
         }
         return T->second; */  
-
+ 
         //Pointers have different hash values.
 
         auto temp = std::find_if(Header_Value.begin(), Header_Value.end(), [&header](auto para){

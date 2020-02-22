@@ -16,7 +16,7 @@ namespace ws{
                         std::shared_ptr<WriteLoop> Wl) : 
                         Provider(Hr, Wl){}
             void provide() final;
-        private:
+        private: 
             bool FileProvider(std::shared_ptr<FileReader>& file);
     };
 

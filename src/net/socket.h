@@ -84,6 +84,8 @@ namespace ws{
             
             virtual ~Socket() {if(Have_Close_) ::close(Socket_fd_);}
             
+            void Set(int fd) noexcept {Socket_fd_ = fd;}
+
             int Close(); 
             int Shutdown() {return ::shutdown(Socket_fd_, SHUT_RDWR);}
             int ShutdownWrite() {return ::shutdown(Socket_fd_, SHUT_WR);}

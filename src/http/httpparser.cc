@@ -192,7 +192,6 @@ namespace ws{
                 User_Buffer_->Write(Extrabuffer_.Get_ptr(), length);
             }
         }
-
     }
 
 #undef If_Conversion

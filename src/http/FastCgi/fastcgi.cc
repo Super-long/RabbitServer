@@ -1,11 +1,10 @@
 #include "fastcgi.h"
-#include <netinet/in.h> //sockaddr_in
-#include <arpa/inet.h> //inet_addr
-//#include <sys/types.h>
-#include <sys/socket.h> //connect
 #include <iostream> //cout endl
 #include <assert.h> //assert
 #include <algorithm> //for_each
+#include <arpa/inet.h> //inet_addr
+#include <netinet/in.h> //sockaddr_in
+#include <sys/socket.h> //connect
 
 namespace ws{
 
@@ -14,8 +13,6 @@ FastCgi::Conection(){
     struct sockaddr_in ServerAddress;
     memset(&ServerAddress, 0, sizeof ServerAddress);
     constexpr char IP[] = "127.0.0.1";
-    assert(socket_.fd() > 0);
-
     ServerAddress.sin_family = AF_INET;
     ServerAddress.sin_addr.s_addr = inet_addr(IP);
     ServerAddress.sin_port = htons(9000);
@@ -151,6 +148,7 @@ FastCgi::ReadContent(){
 
     while(::read(socket_.fd(), &parsering, FCGI_HEADER_LEN) > 0){
         if(parsering.type == FCGI_STDOUT){ //正常输出
+            std::cout << "正确输出\n";
             ContentLength = (parsering.contentLengthB1 << 8) + (parsering.contentLengthB0);//得到内容长度
             memset(Content, 0, CONTENT_BUFFER_LEN);
             //读取获取的内容
@@ -164,6 +162,7 @@ FastCgi::ReadContent(){
                 assert(ret == parsering.paddingLength);
             }
         }else if(parsering.type == FCGI_STDERR){ //错误输出
+            std::cout << "错误输出\n";
             ContentLength = (parsering.contentLengthB1 << 8) + (parsering.contentLengthB0);
             memset(Content, 0, CONTENT_BUFFER_LEN);
             
@@ -175,6 +174,7 @@ FastCgi::ReadContent(){
                 assert(ret == parsering.paddingLength);
             }    
         }else if(parsering.type == FCGI_STDERR){ //错误输出
+            std::cout << "ok!\n";
             FCGI_EndRequestBody endRequest;
 
             ret = read(socket_.fd(), &endRequest, sizeof endRequest);
