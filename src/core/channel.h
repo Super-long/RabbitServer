@@ -11,7 +11,7 @@
 
 #include "../base/nocopy.h"
 #include "../net/epoll.h"
-#include "../base/Y_Dragon.h"
+#include "../base/config.h"
 #include "../base/havefd.h"
 #include "manger.h"
 

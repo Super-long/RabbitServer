@@ -1,4 +1,4 @@
-#include "../base/Y_Dragon.h"
+#include "../base/config.h"
 #include <signal.h>
 #include <iostream>
 #include <assert.h> 
