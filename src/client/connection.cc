@@ -1,12 +1,10 @@
 #include "connection.h"
-#include "../net/socket.h"
 #include "../net/epoll_event.h"
 #include "../net/epoll_event_result.h"
 
 #include <assert.h>
 #include <errno.h>
 #include <iostream>
-#include <functional>
 
 namespace ws{
 
@@ -119,7 +117,8 @@ Connection::HandleWrite(int fd, const std::function<void(int)>& newConnectionCal
             retry(fd);
         }else{
             SetConnectionState(kConnected);
-            newConnectionCallback(fd);
+            newConnectionCallback(fd); //TODO 应该是加入client的map中 且加入Epoll
+            retryDelayMs_ = KInitRetryDelayMs; //为了复用
         }
     }else{
         //This does not happen.
@@ -129,7 +128,16 @@ Connection::HandleWrite(int fd, const std::function<void(int)>& newConnectionCal
 
 void 
 Connection::retry(int fd){
+    ::close(fd);
+    SetConnectionState(kDisconnected);
+    //如何设置时间轮 这是个问题 TODO 这个回调应该是加入到时间轮中并设置eventfd
+    RetryCallBack_(retryDelayMs_);
+    retryDelayMs_ = std::min(retryDelayMs_*2, kMaxRetryDelayMs);
+}
 
+void
+Connection::SetTetryCallBack_(const std::function<void(int)>& callback){
+    RetryCallBack_ = callback;
 }
 
 }

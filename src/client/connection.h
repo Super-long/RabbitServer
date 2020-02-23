@@ -5,6 +5,9 @@
 #include "../net/epoll.h"
 #include "../net/address.h"
 #include "../base/config.h"
+#include "../net/socket.h"
+
+#include <functional>
 
 namespace ws{
 
@@ -20,8 +23,10 @@ Address ServerAddress;
 ConnectionState states;
 std::shared_ptr<Epoll> ClientEpoll;
 Socket socket_;
+std::function<void(int)> RetryCallBack_; //TODO 由client传递
 
-static const int kMaxRetryDelayMs = 30*1000;
+static const int kMaxRetryDelayMs = 48;
+static const int KInitRetryDelayMs = 1;
 
 void SetConnectionState(ConnectionState state){states = state;}
 void Connecting(const Socket& socket);
@@ -34,14 +39,15 @@ struct sockaddr_in6 getPeerAddr(int sockfd);
 
 public:
     explicit Connection(std::shared_ptr<Epoll> ptr) //constexper?
-        : retryDelayMs_(500),
+        : retryDelayMs_(KInitRetryDelayMs),
           states(kDisconnected), 
           ClientEpoll(ptr), 
           socket_(-1),
           ServerAddress(Y_Dragon::MyIP(), Y_Dragon::MyPort()){}
 
-    void Connect();
+    int Connect(int padding); //其实这里不需要参数,但是TimerWheel写的接口有问题
     void HandleWrite(int fd, const std::function<void(int)>& newConnectionCallback);
+    void SetTetryCallBack_(const std::function<void(int)>& callback);
 };
 
 }
