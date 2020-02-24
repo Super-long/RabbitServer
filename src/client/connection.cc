@@ -24,8 +24,8 @@ Connection::Connect(int padding){ //这里的参数仅仅是为了填坑
         case EINPROGRESS: //正在连接
         case EINTR: //当阻塞于某个慢系统调用的一个进程捕获某个信号且相应信号处理函数返回时，该系统调用可能返回一个EINTR错误。
         case EISCONN: //连接成功
-            //Connecting(socket_);
-            retry(socket_.fd());
+            Connecting(socket_);
+            //retry(socket_.fd()); //Test retry.
             break;
 
         case EAGAIN: //临时端口(ephemeral port)不足  
@@ -124,7 +124,7 @@ Connection::HandleWrite(int fd, const std::function<void(int)>& newConnectionCal
             retry(fd);
             std::cerr << "Connection::HandleWrite error.\n";
         }else{
-            std::cout << "连接成功\n";
+            std::cout << "Connect successful.\n";
             SetConnectionState(kConnected);
             newConnectionCallback(fd); //TODO 应该是加入client的map中 且加入Epoll
             retryDelayMs_ = KInitRetryDelayMs; //为了复用
@@ -137,11 +137,16 @@ Connection::HandleWrite(int fd, const std::function<void(int)>& newConnectionCal
 
 void 
 Connection::retry(int fd){ 
+    std::cerr << "start reconnect, Delay is : " << retryDelayMs_ << "S.\n";
+    
     ::close(fd);
     socket_.Set(-1);
     
     SetConnectionState(kDisconnected);
-    if(retryDelayMs_ == kMaxRetryDelayMs) return;
+    if(retryDelayMs_ == kMaxRetryDelayMs){
+        std::cerr << "Reconnect failture, stop reconnect.\n";
+        return;
+    }
     
     RetryCallBack_(retryDelayMs_);
     retryDelayMs_ = std::min(retryDelayMs_*2, kMaxRetryDelayMs);

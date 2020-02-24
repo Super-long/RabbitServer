@@ -11,6 +11,15 @@
 #include <iostream>
 
 namespace{
+    /**
+     * 这里是因为在写TimingWheel时的是按需写的,
+     * 开始是为了支持定时关闭不活跃连接,后来应用
+     * 层重连也要用,导致以前设计的接口有问题,所以
+     * 这里设置一个参数,为了不与_TW_Add_的第一行
+     * 冲突,同样的设计问题在与TimingWheel的接口
+     * 为int(int),现在看来void(void)+bind/function
+     * 是万能的.
+    */
     int Suit_TimingWheel_oneparameter = 0;
 }
 
@@ -33,6 +42,7 @@ Client::ResetEventfd(int Delay){ //这里绑定的参数有问题
     newValue.it_value = std::move(DelayTime);
 
     //第二个参数为零表示相对定时器 TFD_TIMER_ABSTIME为绝对定时器
+    //如果old_value参数非NULL,itimerspec结构体指向是用来返回该定时器的设置在当前时间的调用时的; 查看timerfd_gettime()描述.
     int ret = ::timerfd_settime(eventfd_.fd(), 0, &newValue, &oldValue);
     if(ret == -1) 
         std::cerr << "Client::ResetEventfd.timerfd_settime failture.\n";
@@ -80,10 +90,15 @@ Client::Run(){
         for(int i = 0; i < Event_Reault.size(); ++i){
             auto & item = Event_Reault[i];
             int id = item.Return_fd();
-            if(id == eventfd_.fd()){
+            if(id == eventfd_.fd()){ //定时事件
                 TimerWheel_->TW_Tick();
                 //eventfd_.Read();
                 Epoll_->Modify(eventfd_, EpollCanRead());
+            }else if(id == Channel_.fd()){ //有新加入事件
+                RunAndPop();
+                Epoll_->Modify(*(Sockers_.begin()->second), EpollCanRead());
+                //这里也是测试
+                //现在有一个很重要的问题就是  
             }else if(item.check(EETRDHUP)){ //断开连接
                 std::cout << "删除\n";                
                 Remove(id);
