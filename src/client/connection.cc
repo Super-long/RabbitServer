@@ -8,17 +8,24 @@
 
 namespace ws{
 
-void
-Connection::Connect(){
-    Socket socker_;
-    int ret = ::connect(socker_.fd(), ServerAddress.Return_Pointer(), ServerAddress.Return_length());
+const int 
+Connection::kMaxRetryDelayMs = 48;
+
+const int
+Connection::KInitRetryDelayMs = 1;
+
+int
+Connection::Connect(int padding){ //这里的参数仅仅是为了填坑
+    socket_.Set(::socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, IPPROTO_TCP));
+    int ret = ::connect(socket_.fd(), ServerAddress.Return_Pointer(), ServerAddress.Return_length());
     int SaveErrno = (ret == 0) ? 0 : errno;
     switch (SaveErrno){
         case 0:
         case EINPROGRESS: //正在连接
         case EINTR: //当阻塞于某个慢系统调用的一个进程捕获某个信号且相应信号处理函数返回时，该系统调用可能返回一个EINTR错误。
         case EISCONN: //连接成功
-            Connecting(socker_);
+            //Connecting(socket_);
+            retry(socket_.fd());
             break;
 
         case EAGAIN: //临时端口(ephemeral port)不足  
@@ -26,7 +33,7 @@ Connection::Connect(){
         case EADDRNOTAVAIL://配置的IP不对
         case ECONNREFUSED: //服务端在我们指定的端口没有进程等待与之连接
         case ENETUNREACH: //表示目标主机不可达 
-            retry(socker_.fd());
+            retry(socket_.fd());
             break;
 
         case EACCES: //没有权限
@@ -36,20 +43,20 @@ Connection::Connect(){
         case EBADF: //无效的文件描述符
         case EFAULT: //操作套接字时的一些参数无效
         case ENOTSOCK: //不是一个套接字
-            ::close(socker_.fd());
+            ::close(socket_.fd());
             break;
 
         default:
-            ::close(socker_.fd());
+            ::close(socket_.fd());
             // connectErrorCallback_();
             break;
     }
 }
 
 void 
-Connection::Connecting(const Socket& socket){
+Connection::Connecting(const Socket& socket_){
     SetConnectionState(kConnecting);
-    ClientEpoll->Add(socket, EpollCanWite());
+    ClientEpoll->Add(socket_, EpollCanWite()); //这里没办法加进去
 }
 
 struct sockaddr_in6 
@@ -57,8 +64,7 @@ Connection::getLocalAddr(int sockfd){
     struct sockaddr_in6 localaddr;
     memset(&localaddr, 0, sizeof localaddr);
     socklen_t addrlen = static_cast<socklen_t>(sizeof localaddr);
-    if (::getsockname(sockfd, static_cast<struct sockaddr*>(static_cast<void*>(&localaddr)), &addrlen) < 0)
-    {
+    if (::getsockname(sockfd, static_cast<struct sockaddr*>(static_cast<void*>(&localaddr)), &addrlen) < 0){
         std::cerr << "sockets::getLocalAddr";
     }
     return localaddr;
@@ -112,10 +118,13 @@ Connection::HandleWrite(int fd, const std::function<void(int)>& newConnectionCal
     if(states == kConnecting){
         int err = getSocketError(fd);
         if(err){ //连接错误 
-
+            retry(fd);
+            std::cerr << "Connection::HandleWrite error.\n";
         }else if(isSelfConnect(fd)){ //出现自连接
             retry(fd);
+            std::cerr << "Connection::HandleWrite error.\n";
         }else{
+            std::cout << "连接成功\n";
             SetConnectionState(kConnected);
             newConnectionCallback(fd); //TODO 应该是加入client的map中 且加入Epoll
             retryDelayMs_ = KInitRetryDelayMs; //为了复用
@@ -127,10 +136,13 @@ Connection::HandleWrite(int fd, const std::function<void(int)>& newConnectionCal
 }
 
 void 
-Connection::retry(int fd){
+Connection::retry(int fd){ 
     ::close(fd);
+    socket_.Set(-1);
+    
     SetConnectionState(kDisconnected);
-    //如何设置时间轮 这是个问题 TODO 这个回调应该是加入到时间轮中并设置eventfd
+    if(retryDelayMs_ == kMaxRetryDelayMs) return;
+    
     RetryCallBack_(retryDelayMs_);
     retryDelayMs_ = std::min(retryDelayMs_*2, kMaxRetryDelayMs);
 }

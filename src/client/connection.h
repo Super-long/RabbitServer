@@ -1,10 +1,10 @@
 #ifndef CONNECTION_H_
 #define CONNECTION_H_
 
+#include "../base/config.h"
 #include "../base/nocopy.h"
 #include "../net/epoll.h"
 #include "../net/address.h"
-#include "../base/config.h"
 #include "../net/socket.h"
 
 #include <functional>
@@ -25,11 +25,11 @@ std::shared_ptr<Epoll> ClientEpoll;
 Socket socket_;
 std::function<void(int)> RetryCallBack_; //TODO 由client传递
 
-static const int kMaxRetryDelayMs = 48;
-static const int KInitRetryDelayMs = 1;
+static const int kMaxRetryDelayMs;
+static const int KInitRetryDelayMs;
 
 void SetConnectionState(ConnectionState state){states = state;}
-void Connecting(const Socket& socket);
+void Connecting(const Socket& socket_);
 void retry(int fd);
 
 int getSocketError(int sockfd);
