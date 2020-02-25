@@ -17,6 +17,7 @@
 #define HTTPREQUEST_H_
 
 #include <unordered_map>
+
 #include "../base/nocopy.h"
 #include "../tool/userbuffer.h"
 #include "../tool/parsed_header.h"
@@ -64,7 +65,6 @@ namespace ws{
             ParsedHeader Get_Value(const ParsedHeader&) const;
 
             bool Request_good() const{
-                //std::cout <<  "Fault " << Fault_  << std::endl; 
                 return Fault_ == HPFContent;}
 
         private:

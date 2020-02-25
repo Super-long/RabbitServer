@@ -17,7 +17,9 @@
 #define ADDRESS_H_
 
 #include "../base/copyable.h"
+
 #include <arpa/inet.h>
+
 namespace ws{
     class Address : public Copyable{
         public:

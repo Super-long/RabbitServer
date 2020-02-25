@@ -15,6 +15,7 @@
 
 #include "httpparser.h"
 #include "httpstatus.h"
+
 #include <cstring>
 
 namespace ws{
@@ -88,7 +89,7 @@ namespace ws{
                     If_Conversion(ch == 'O',HPSOPTION);
                     If_Conversion(ch == 'H',HPSHEAD);
                     If_Conversion(ch == 'D',HPSDELETE);
-                    If_Conversion(ch == ' ',HPSOK);                    
+                    If_Conversion(ch == ' ',HPSOK); 
                     Set_Fault(HPFInvaildMethod);
                 case HPSOPTION:
                     User_Buffer_->Read(Buffer,6);

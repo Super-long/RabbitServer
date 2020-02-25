@@ -21,6 +21,7 @@
 #include "httprequest.h"
 #include "httpstatus.h"
 #include "../net/socket.h"
+
 #include <memory>
 
 namespace ws{ 
@@ -42,7 +43,7 @@ namespace ws{
             std::shared_ptr<HttpRequest> Request_Result; 
             Extrabuf& Extrabuffer_;
             bool Parsering();
-            bool Parser_able(){ return User_Buffer_->Readable() >= 16;}
+            bool Parser_able(){return User_Buffer_->Readable() >= 16;}
     };
 
 }

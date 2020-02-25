@@ -16,10 +16,12 @@
 #ifndef WEBSERVER_EPOLL
 #define WEBSERVER_EPOLL
 
-#include <sys/epoll.h>
 #include "epoll_event_result.h"
 #include "../base/nocopy.h"
 #include "../base/havefd.h"
+
+#include <sys/epoll.h>
+
 #include <iostream>
 
 namespace ws{

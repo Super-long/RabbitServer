@@ -4,35 +4,21 @@
 #include <unistd.h>
 #include <iostream>
 
-ws::Client client_;
+ws::Client client_; 
 
-void test(){
-    client_.Run();    
-}
-
-const char Content[] = R"(GET server.dot HTTP/1.1
+const char Content[] = R"(********GET server.dot HTTP/1.1
 Host: /home/lizhaolong/suanfa/Web_Server/WebServer
 User-Agent: curl/7.52.1
 Connection: Close
 
 )";
 
-void Test(int fd){
-    std::string str(Content);
-    std::cout << str << std::endl;
-    ::write(fd, str.c_str(), str.length());
-    getchar();
-}
-
 int main(){
-    client_.Connect();
+    //client_.Connect();
+    //sleep(1);
+    client_.Start(); //开启事件循环
+    client_.Connect(); //Connect与SendToServer的第一次执行要有一个同步关系
     sleep(1);
-    auto son = std::thread(test);
-    
-    sleep(1);
-    int fd = client_.TestInterface();
-    std::cout << fd << std::endl;
-    client_.Push(std::bind(Test, fd));
-    son.join();
+    client_.SendToServer(Content);
     return 0;
 }

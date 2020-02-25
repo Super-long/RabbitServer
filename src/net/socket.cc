@@ -42,6 +42,7 @@ namespace ws{
         //deepin 15.7 x86 long int
         ssize_t sum = 0;
         ssize_t ret = 0;
+        char* strart = ptr->WritePtr();
         char* StartBuffer = ptr->WritePtr();
         while(true){
             std::cout << "errno : " << errno << std::endl;
@@ -79,6 +80,9 @@ namespace ws{
                     continue;
             }
         } 
+/*         std::string str(strart, ptr->Readable());
+        std::cout << "内容 : " << str[0] << " : " << str[1] << std::endl;
+        std::cout << "readable : " << ptr->Readable() << std::endl;  */
         std::cout << "recv : " << sum << std::endl; 
         return static_cast<int>(sum);
     }

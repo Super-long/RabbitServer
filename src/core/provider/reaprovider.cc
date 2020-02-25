@@ -81,6 +81,9 @@ namespace ws{
         (static_cast<FileProxy>(_Request_->Get_Value(static_cast<ParsedHeader>("Host")).ReadPtr())
         , _Request_->Return_Uri().ReadPtr());  */
 
+        //std::cout << "str " << str << std::endl;
+        //std::cout << "release1 : " << release_ptr2 << std::endl;
+
         file = std::make_shared<FileReader>   
         (static_cast<FileProxy>(str.c_str())
         , release_ptr2);

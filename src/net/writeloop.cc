@@ -14,6 +14,7 @@
 */
 
 #include "writeloop.h"
+
 #include <cstdarg>
 #include <sys/socket.h>
 
@@ -68,7 +69,6 @@ namespace ws{
     }
 
     WriteLoop::COMPLETETYPE WriteLoop::DoAll(){
-        std::cout << "回复消息\n";
         while(1){
             auto CompleteType = DoFirst();
             if(CompleteType == COMPLETE) continue;
