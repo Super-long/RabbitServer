@@ -71,7 +71,7 @@ namespace ws{
         _Epoll_.Modify(*Fd_To_Member[fd],EpollCanWite());  
     }
 
-    int Manger::JudgeToClose(int fd){
+    int Manger::JudgeToClose(int fd){   // 函数没有返回值
         if(!Exist(fd)){
             throw std::invalid_argument("'Manger::JudgeToClose' Don't have this fd.");
         }

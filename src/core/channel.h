@@ -41,7 +41,7 @@ private:
 public:
     explicit channel(int fd) : eventfd(fd), _Epoll_(), _Manger_(_Epoll_){}
 
-    int fd() const override {
+    int fd() const & noexcept override {
         return eventfd;
     }
 

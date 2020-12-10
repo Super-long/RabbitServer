@@ -27,7 +27,7 @@ void flushFunc()
 
 int main(int argc, char* argv[])
 {
-   char name[256] = { 0 }; 
+  char name[256] = { 0 }; 
   strncpy(name, argv[0], sizeof name - 1);
   g_logFile.reset(new ws::detail::logfile(::basename(name), 200*1000));
   ws::detail::logging::setOutput(outputFunc);
@@ -39,5 +39,5 @@ int main(int argc, char* argv[])
     ws::detail::log_INFO(__FILE__, __LINE__, errno).stream() << line << i << ":" << "\n";
 
     //usleep(1000);
-  } 
+  }
 }

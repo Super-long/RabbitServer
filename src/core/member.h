@@ -44,7 +44,7 @@ namespace ws{
             void DoWrite(); 
             bool CloseAble() const; 
 
-            int fd() const final{return Socket_Ptr->fd();} 
+            int fd() const & noexcept final{return Socket_Ptr->fd();} 
             void Init(); 
 
             bool IsWriteComplete() const noexcept {return WriteComplete;}

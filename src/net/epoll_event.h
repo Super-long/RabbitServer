@@ -28,14 +28,19 @@ namespace ws{
         EETCOULDREAD  = ::EPOLLIN,
         EETCOULDWRITE = ::EPOLLOUT,
         EETEDGETRIGGER= ::EPOLLET,
-        EETRDHUP      = ::EPOLLRDHUP,
-        EETONLYONE    = ::EPOLLONESHOT,
-        EETERRNO      = ::EPOLLERR,
-        EETPRI        = ::EPOLLPRI,
-        EETHUP        = ::EPOLLHUP
+        EETRDHUP      = ::EPOLLRDHUP,   // 对端断开连接
+        EETONLYONE    = ::EPOLLONESHOT, // 防止多线程同时读取一个套接字的数据 // https://blog.csdn.net/liuhengxiao/article/details/46911129?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522160760757619724816652703%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=160760757619724816652703&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~baidu_landing_v2~default-1-46911129.first_rank_v2_pc_rank_v29&utm_term=EPOLLONESHOT&spm=1018.2118.3001.4449
+        EETERRNO      = ::EPOLLERR,     // 在给已经关闭的socket写时，会发生EPOLLERR
+        EETPRI        = ::EPOLLPRI,     // 外带数据
+
+        // EPOLLHUP不需要在epoll中设置，默认注册，见man手册；
+        EETHUP        = ::EPOLLHUP      // 当socket的一端认为对方发来了一个不存在的4元组请求的时候,会回复一个RST响应,在epoll上会响应为EPOLLHUP事件
+        // linux - TCP:何时生成EPOLLHUP？https://www.coder.work/article/172009
+        // https://man7.org/linux/man-pages/man2/epoll_ctl.2.html
     };
 
-    constexpr EpollEventType EpollTypeBase() {return static_cast<EpollEventType>(EETEDGETRIGGER | EETONLYONE | EETRDHUP); }
+    // EpollTypeBase的设置意味着我们在收到半关闭时仍然会关闭连接；
+    constexpr EpollEventType EpollTypeBase() {return static_cast<EpollEventType>(EETEDGETRIGGER | EETONLYONE | EETRDHUP); } // EPOLLHUP
     constexpr EpollEventType EpollCanRead() {return static_cast<EpollEventType>(EpollTypeBase() | EETCOULDREAD); }
     constexpr EpollEventType EpollCanWite() {return static_cast<EpollEventType>(EpollTypeBase() | EETCOULDWRITE); }
     constexpr EpollEventType EpollRW() {return static_cast<EpollEventType>(EpollTypeBase() | EETCOULDWRITE | EETCOULDREAD); }
@@ -44,20 +49,21 @@ namespace ws{
         public:
             EpollEvent() : event_(){}                   //这里的原因是因为epoll_event这个结构体中还包含者一个共用体
             explicit EpollEvent(int fd) : event_(epoll_event{EpollRW(),{.fd = fd}}){}
-            EpollEvent(int fd,EpollEventType EET) : event_(epoll_event{EET,{.fd = fd}}){}
-            EpollEvent(const Havefd& Hf,EpollEventType EET) : 
-                event_(epoll_event{EET,{.fd = Hf.fd()}}){} //这样可以被Havefd的派生类构造 其中包含fd 可行
+            EpollEvent(int fd, EpollEventType EET) : event_(epoll_event{EET,{.fd = fd}}){}
+            EpollEvent(const Havefd& Hf, EpollEventType EET) : 
+                event_(epoll_event{EET, {.fd = Hf.fd()}}){} //这样可以被Havefd的派生类构造 其中包含fd 可行
 
-            bool check(EpollEventType EET){return event_.events & EET;}
-            bool check(std::initializer_list<EpollEventType> EET){
+            bool check(EpollEventType EET) noexcept {return event_.events & EET;}
+            bool check(std::initializer_list<EpollEventType> EET) noexcept {
                 for(auto T : EET){
                     if(!(event_.events & T)) return false;
                 }
                 return true;
             }
-            epoll_event* Return_Pointer()noexcept {return &event_;}
-            int Return_fd()const noexcept {return event_.data.fd;}
-            uint32_t Return_EET()const noexcept {return event_.events;}
+            
+            epoll_event* Return_Pointer() noexcept {return &event_;}
+            int Return_fd() const noexcept {return event_.data.fd;}
+            uint32_t Return_EET() const noexcept {return event_.events;}
         private:
             epoll_event event_;
     };

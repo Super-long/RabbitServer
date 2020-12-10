@@ -31,6 +31,7 @@ Connection::KInitRetryDelayMs = 1;
 
 int
 Connection::Connect(int padding){ //这里的参数仅仅是为了填坑
+    // 每次需要重新创建一个套接字，因为可能出现自连接的情况，端口不能在重用了；
     socket_.Set(::socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, IPPROTO_TCP));
     int ret = ::connect(socket_.fd(), ServerAddress.Return_Pointer(), ServerAddress.Return_length());
     int SaveErrno = (ret == 0) ? 0 : errno;
@@ -109,6 +110,8 @@ Connection::getSocketError(int sockfd){
     }
 }
 
+// 一般而言在连接的时候客户端会让内核随机指定一个端口；自连接其实就是在本地目的IP与目的端口与本端IP还有本地端口相同；
+// 明明这个端口已经用于listen，这个端口还是可以用于连接，所以可能出现自连接的情况；很诡异的一种情况
 bool 
 Connection::isSelfConnect(int sockfd){
     struct sockaddr_in6 localaddr = getLocalAddr(sockfd);
@@ -135,7 +138,7 @@ Connection::HandleWrite(int fd, const std::function<void(int)>& newConnectionCal
         if(err){ //连接错误 
             retry(fd);
             std::cerr << "Connection::HandleWrite error.\n";
-        }else if(isSelfConnect(fd)){ //出现自连接
+        }else if(isSelfConnect(fd)){ //出现自连接，此时重新连接就可以了
             retry(fd);
             std::cerr << "Connection::HandleWrite error.\n";
         }else{

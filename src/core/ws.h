@@ -22,7 +22,7 @@
 #include "channel.h"
 
 namespace ws{
-    class Web_Server{
+    class Web_Server{ 
         public:
             Web_Server();
             void Running();

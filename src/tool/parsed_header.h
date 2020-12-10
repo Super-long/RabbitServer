@@ -39,8 +39,9 @@ namespace ws{
                 memcpy(Start, Header, static_cast<size_t>(bytes));
             }
             
-            virtual std::unique_ptr<char[]> Read(int bytes){
+            [[deprecated]] virtual std::unique_ptr<char[]> Read(int bytes){
                 //This is a design error. 
+                return nullptr;
             }
             size_t Writeable() const{
                 return length;

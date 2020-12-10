@@ -22,24 +22,24 @@
 
 namespace Y_Dragon{
 
-    constexpr char* Version(){
+    constexpr char* Version() noexcept {
         return (char*)"0.0";
         //return static_cast<char*>("0.0");
     }
     
-    constexpr int MyPort(){
+    constexpr int MyPort() noexcept {
         return 8888;
     }
 
-    constexpr char* MyIP(){
+    constexpr char* MyIP() noexcept {
         return (char*)"127.0.0.1";
     }
 
-    constexpr int FastCgiPort();
+    constexpr int FastCgiPort() noexcept;
 
-    constexpr char* FastCgiIP();
+    constexpr char* FastCgiIP() noexcept;
 
-    constexpr int EventResult_Number(){
+    constexpr int EventResult_Number() noexcept {
         return 8096;
     }
 

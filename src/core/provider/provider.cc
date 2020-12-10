@@ -79,12 +79,12 @@ namespace ws{
     }
 
     int Provider::RegularProvide(long Content_Length){
-        RegularProvide(Content_Length, AutoAdapt());
+        return RegularProvide(Content_Length, AutoAdapt());
     }
 
     //TODU 类型在csdn收藏中 需要正则去处理文件
     const char* Provider::MIME(const char* type, ptrdiff_t len) const{
-
+        return nullptr;
     }
 
     int Provider::ProvideError(){

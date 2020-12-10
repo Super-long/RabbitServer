@@ -68,7 +68,7 @@ constexpr const char* LogLevelName[logging::NUM_LOG_LEVELS] = {
 
 //TODO helper class for known string length at compile time 没搞懂为什么
 struct helper{ //TODO 可以到时候改成constexper
-     helper(const char* str, unsigned len)
+    constexpr helper(const char* str, unsigned len)
             :str_(str),
              len_(len){
         assert(strlen(str) == len_);

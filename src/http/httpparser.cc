@@ -41,6 +41,7 @@ namespace ws{
         Request_Result->Set_Uri({Parser_Result->Uri, Parser_Result->Uri_length});
         Request_Result->Set_Request_Buffer(User_Buffer_);
 
+        return true;
     }
 
     HttpParserFault HttpParser::Starting_Parser(){ 
@@ -208,6 +209,7 @@ namespace ws{
                 User_Buffer_->Write(Extrabuffer_.Get_ptr(), length);
             }
         }
+        return true;
     }
 
 #undef If_Conversion

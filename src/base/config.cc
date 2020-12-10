@@ -26,7 +26,7 @@ namespace Y_Dragon{
         return 8888;
     } */
 
-    constexpr int FastCgiPort(){
+    constexpr int FastCgiPort() noexcept {
         return 9000;
     }
 
@@ -34,7 +34,7 @@ namespace Y_Dragon{
         return 8096;
     }
  */
-    constexpr char* FastCgiIP(){
+    constexpr char* FastCgiIP() noexcept {
         return (char*)"127.0.0.1";
     }
 

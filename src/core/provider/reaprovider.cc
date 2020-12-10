@@ -24,7 +24,7 @@
 namespace ws{
 
     void REAProvider::provide(){ 
-        std::shared_ptr<FileReader> file = nullptr;
+        std::shared_ptr<FileReader> file = nullptr; 
 
         if(_Request_->Return_Method() == HRPost){ //fastcgi.
             FastCgi fc;

@@ -65,6 +65,7 @@ namespace ws{
                 extrabuf.reset(new char[BufferSize*2]);
                 memcpy(extrabuf.get(), TempPtr.get(), BufferSize);
                 BufferSize*=2;
+                return true;
             }
 
             void SetHighWaterMarkCallback_(std::function<void()> fun){
@@ -106,7 +107,7 @@ namespace ws{
             int ShutdownWrite() {return ::shutdown(Socket_fd_, SHUT_WR);}
             int ShutdownRead() {return ::shutdown(Socket_fd_, SHUT_RD);}
             
-            int fd() const noexcept override {return Socket_fd_; }
+            int fd() const & noexcept override {return Socket_fd_; }
             int SetNoblocking(int flag = 0);
             int SetNoblockingCLOEXEC(){
                 return Socket::SetNoblocking(O_CLOEXEC); 

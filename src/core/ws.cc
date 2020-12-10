@@ -24,6 +24,10 @@
 
 namespace ws{
 
+    /*
+     * @notes: gettimeofday的缺点是精度比较低，但是速度快，因为它不是一个系统调用，且微秒已经可以满足我们的需要,所以没有必要用cpp的接口去写这个；
+     * 《[如何精确测量一段代码的执行时间](https://www.0xffffff.org/2015/12/06/37-How-to-benchmark-code-execution-times/)》
+     */
     int64_t Get_Current_Time(){
         timeval now;
         int ret = gettimeofday(&now, nullptr);
@@ -33,9 +37,14 @@ namespace ws{
 
     Web_Server::Web_Server() : _Epoll_(), _Manger_(_Epoll_), _Server_(Y_Dragon::MyPort()){}
  
-    void Web_Server::Running(){ 
+    void Web_Server::Running(){
         try{
             signal(SIGPIPE, SIG_IGN);
+
+            // 其实这两个玩意对于性能没有啥帮助；《[读入，输出优化](https://oi-wiki.org/contest/io/)》
+            std::ios::sync_with_stdio(false);
+            std::cin.tie(nullptr);
+
             _Server_.Set_AddrRUseP();
             _Server_.Server_BindAndListen();
             _Epoll_.Add(_Server_, EpollCanRead());

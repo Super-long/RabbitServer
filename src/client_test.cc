@@ -6,8 +6,8 @@
 
 ws::Client client_; 
 
-const char Content[] = R"(********GET server.dot HTTP/1.1
-Host: /home/lizhaolong/suanfa/Web_Server/WebServer
+const char Content[] = R"(********GET graph.dot HTTP/1.1
+Host: /home/lizhaolong/Desktop/Exercise/RabbitServer
 User-Agent: curl/7.52.1
 Connection: Close
 

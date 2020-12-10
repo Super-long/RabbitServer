@@ -18,7 +18,7 @@
  7. 解决TCP窗口大小不足导致write/send失败
  8. 支持不活跃用户自动关闭连接
  9. 为保证高性能在发送文件时使用`零拷贝`
- 10. 利用析构函数,智能指针等手段实现`RAII`机制,理论无内存泄露
+ 10. 利用析构函数,智能指针等手段实现`RAII`机制,无内存泄露
  11. 实现`Fastcgi`协议与后台运行的php-fpm进行通信
  12. 使用非阻塞connect实现简单客户端,支持`用户态重连`
 
@@ -29,3 +29,11 @@
  2. busy_loop
  3. TCP窗口
  4. reactor的理解还不够
+
+1. 在HTTP返回中加上Content-Language:en-US 或者 zh-CN
+2. 返回中加上Allow字段
+3. 加上Content-Encoding
+4. Content-Location
+5. 貌似host功能指定的有问题
+
+[ab的用法](https://www.howtoing.com/how-to-use-apachebench-to-do-load-testing-on-an-arch-linux-vps)
