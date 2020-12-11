@@ -16,8 +16,8 @@ Connection: Close
 int main(){
     //client_.Connect();
     //sleep(1);
-    client_.Start(); //开启事件循环
-    client_.Connect(); //Connect与SendToServer的第一次执行要有一个同步关系
+    client_.Start(); // 开启事件循环
+    client_.Connect(); // Connect与SendToServer的第一次执行要有一个同步关系
     sleep(1);
     client_.SendToServer(Content);
     return 0;

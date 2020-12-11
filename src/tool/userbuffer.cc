@@ -18,6 +18,7 @@
 
 namespace ws{
  
+    // 向Start这个缓冲区中写入bytes个字节，并把read_slot向后移动
     void UserBuffer::Read(char* Start, int bytes) {
         if(Read_Spot + bytes > Write_Spot){
             throw std::out_of_range("'UserBuffer::Read' Out ou range when reading.");
@@ -51,12 +52,14 @@ namespace ws{
         return Buffer_[Read_Spot + jump];
     }
 
+    // 返回成功写入的字节数
     int UserBuffer::Write(int bytes){
         if(bytes > Writeable()){
             throw std::out_of_range("'UserBuffer::Write' The parameter is not in the valid range");
         }
         Write_Spot += bytes;
         Move_Buffer();
+        return bytes;
     }
 
     int UserBuffer::Write(char* Buf, int bytes){
@@ -101,9 +104,14 @@ namespace ws{
     }
 
     void UserBuffer::Move_Buffer(){
+        // 并不是每一次都会拷贝，在读指针大于缓存的一半的时候再拷贝；
+        if(Read_Spot < Buffer_Size / 2){
+            return;
+        }
         size_t inter = Write_Spot - Read_Spot;
         memcpy(Buffer_.get(), Buffer_.get() + Read_Spot, inter);
         Read_Spot = 0;
         Write_Spot = inter;
+        return;
     }
 }

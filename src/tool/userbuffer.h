@@ -21,6 +21,7 @@
 #include <memory>
 #include <string>
 #include <stdexcept>
+#include <cstddef>
  
 namespace ws{
     class UserBuffer : public Nocopy,public BaseBuffer{
@@ -52,11 +53,11 @@ namespace ws{
             int Write(const std::string& str);
             int SWrite(const char* , va_list);
 
-            void Clean(){Write_Spot = 0,Read_Spot = 0;}
-            size_t WSpot()const noexcept {return Write_Spot;}
-            size_t RSpot()const noexcept {return Read_Spot;}
-            void ReWirte(int spot) noexcept{Write_Spot = static_cast<size_t>(spot);}
-            void Move_Buffer(); 
+            void Clean() {Write_Spot = 0,Read_Spot = 0;}
+            size_t WSpot() const noexcept {return Write_Spot;}
+            size_t RSpot() const noexcept {return Read_Spot;}
+            void ReWirte(int spot) noexcept {Write_Spot = static_cast<size_t>(spot);}
+            void Move_Buffer();
 
         private:
             std::unique_ptr<char[]> Buffer_;

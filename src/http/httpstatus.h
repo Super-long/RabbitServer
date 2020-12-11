@@ -59,43 +59,44 @@ namespace ws{
         Keep_Alive,
     };
 
+    // 状态机中的状态
     enum HttpParserStatus{
-        HPSOK,
-        HPSGAMEOVER,
-        HPSGET,
+        HPSOK,          // 初始状态
+        HPSGAMEOVER,    // 解析失败
+        HPSGET,         // 几种请求方法名称
         HPSPOST,
         HPSOPTION,
         HPSHEAD,
         HPSDELETE,
-        HPSBetweenMU,
-        HPSUriStart,
-        HPSURIParser,
-        HPSUriEnd,
-        HPSVersionMajor,
-        HPSVersionMinor,
-        HPSVersionEnd,
-        HPSLF,
-        HPSCRLFCR,
-        HPSHeader,
-        HPSColon,
-        HPSHeader_Value,
-        HPSStore_Header,
+        HPSBetweenMU,   // 开始解析空格   
+        HPSUriStart,    // 开始解析URI
+        HPSURIParser,   // 已经设置了url的初始指针，逐个增加有效的url位
+        HPSUriEnd,      // 读取至第一个空格，url解析失败
+        HPSVersionMajor,// 解析版本号高位
+        HPSVersionMinor,// 解析版本号低位
+        HPSVersionEnd,  // 版本解析结束
+        HPSLF,          // 需要一个LF
+        HPSCRLFCR,      // 已经有了一个LF，需要一个CR
+        HPSHeader,      // 开始解析请求头部分
+        HPSColon,       // 解析到了请求头的冒号
+        HPSHeader_Value,// 开始解析请求头的值部分
+        HPSStore_Header,// 解析到了一个键值对，开始存储
 
     };
 
     enum HttpParserFault{
-        HPFOK,
-        HPFToLittleMessage,
-        HPFInvaildMethod,
-        HPFBetween_Method_URI_NoBlank, 
-        HPFInvaildUri,
-        HPFInvaildVersion,
-        HPFNoSupportVersion,
-        HPFInvaildHeader,
-        HPFInvaildHeader_Value,
-        HPFContentLength,
-        HPFSetConnection,
-        HPFContent,
+        HPFOK,                          // 解析成功
+        HPFToLittleMessage,             // 数据包太短
+        HPFInvaildMethod,               // http请求方法无效
+        HPFBetween_Method_URI_NoBlank,  // 在http请求方法和URI之间没有空格
+        HPFInvaildUri,                  // url中字符不正确
+        HPFInvaildVersion,              // http版本号解析有问题
+        HPFNoSupportVersion,            // 解析出来的版本号不支持
+        HPFInvaildHeader,               // 解析首部字段失败
+        HPFInvaildHeader_Value,         // 头部的值
+        HPFContentLength,               // 在Content-Length字段的值中存在非数字的值
+        HPFSetConnection,               // 在Connection字段有除了close和keep-alive以外出现了别的字符串
+        HPFContent,                     // 请求头解析完毕，准备解析Content
         HPFCRLFCR,
         HPFContent_Nonatch_Length,
     };

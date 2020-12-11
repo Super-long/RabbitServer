@@ -28,7 +28,7 @@ namespace ws{
 
     class HttpParser : public Nocopy{  
         public: 
-            explicit HttpParser(std::shared_ptr<UserBuffer> ptr, std::shared_ptr<HttpRequest> request,Extrabuf& extra):
+            HttpParser(std::shared_ptr<UserBuffer> ptr, std::shared_ptr<HttpRequest> request, Extrabuf& extra):
                 User_Buffer_(std::move(ptr)),Parser_Result(std::make_unique<HttpParser_Content>()),Request_Result(request),Extrabuffer_(extra){}
 
             void Again_Parser(); 
@@ -43,7 +43,7 @@ namespace ws{
             std::shared_ptr<HttpRequest> Request_Result; 
             Extrabuf& Extrabuffer_;
             bool Parsering();
-            bool Parser_able(){return User_Buffer_->Readable() >= 16;}
+            bool Parser_able(){return User_Buffer_->Readable() >= 16;}  // 请求行+空行，最小的HTTP方法为三字节
     };
 
 }

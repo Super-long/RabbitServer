@@ -16,7 +16,6 @@
 #ifndef BASEBUFFER_H_
 #define BASEBUFFER_H_
 
-#include <cstddef>
 #include <memory>
 
 namespace ws{

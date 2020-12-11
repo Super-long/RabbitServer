@@ -21,31 +21,31 @@
 #include <sys/socket.h>
 
 namespace ws{
-    int Manger::Opera_Member(std::unique_ptr<Member>& ptr,EpollEventType& EE){
+    int Manger::Opera_Member(std::unique_ptr<Member>& ptr, EpollEventType& EE){
         int id = ptr->fd();         //RTTI
         Fd_To_Member.emplace(id,ptr.release());
+        _Epoll_.Add(*Fd_To_Member[id], std::move(EE)); 
+        return id;      
+    }
+
+    int Manger::Opera_Member(std::unique_ptr<Member>&& ptr, EpollEventType&& EE){
+        int id = ptr->fd();
+        Fd_To_Member.emplace(id, std::move(ptr.release()));
+        _Epoll_.Add(*Fd_To_Member[id],std::move(EE));
+        return id;
+    }
+
+    int Manger::Opera_Member(std::unique_ptr<Member>&& ptr, EpollEventType& EE){
+        int id = ptr->fd();         
+        Fd_To_Member.emplace(id, std::move(ptr.release()));
         _Epoll_.Add(*Fd_To_Member[id],EE); 
         return id;      
     }
 
-    int Manger::Opera_Member(std::unique_ptr<Member>&& ptr,EpollEventType&& EE){
+    int Manger::Opera_Member(std::unique_ptr<Member>& ptr, EpollEventType&& EE){
         int id = ptr->fd();         
         Fd_To_Member.emplace(id,ptr.release());
-        _Epoll_.Add(*Fd_To_Member[id],EE); 
-        return id;      
-    }
-
-    int Manger::Opera_Member(std::unique_ptr<Member>&& ptr,EpollEventType& EE){
-        int id = ptr->fd();         
-        Fd_To_Member.emplace(id,ptr.release());
-        _Epoll_.Add(*Fd_To_Member[id],EE); 
-        return id;      
-    }
-
-    int Manger::Opera_Member(std::unique_ptr<Member>& ptr,EpollEventType&& EE){
-        int id = ptr->fd();         
-        Fd_To_Member.emplace(id,ptr.release());
-        _Epoll_.Add(*Fd_To_Member[id],EE); 
+        _Epoll_.Add(*Fd_To_Member[id], std::move(EE)); 
         return id;      
     }
 

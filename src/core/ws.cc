@@ -45,7 +45,8 @@ namespace ws{
             std::ios::sync_with_stdio(false);
             std::cin.tie(nullptr);
 
-            _Server_.Set_AddrRUseP();
+            _Server_.Set_AddrRUseA();
+            _Server_.Base_Setting();
             _Server_.Server_BindAndListen();
             _Epoll_.Add(_Server_, EpollCanRead());
             EpollEvent_Result Event_Reault(Y_Dragon::EventResult_Number());

@@ -27,7 +27,7 @@
 #include <memory>
 
 namespace ws{
-    class Manger : public Copyable{ 
+    class Manger : public Copyable{
         using Fun = std::function<int(int)>; 
         public:
             explicit Manger(Epoll& _epoll) : 
@@ -38,7 +38,7 @@ namespace ws{
             int Opera_Member(std::unique_ptr<Member>&, EpollEventType&&);
             int Opera_Member(std::unique_ptr<Member>&&, EpollEventType&);
             
-            //Signal driven when used.
+            // 在使用的时候是信号驱动，当然可以使用signalfd，把信号驱动修改为事件驱动；
             void TimeWheel(int fd);
 
             void Reading(int fd, long time = -1);
@@ -48,12 +48,12 @@ namespace ws{
             int UpdateWrite(int fd);
 
             int Remove(int fd);
-            bool Exist(int fd){if(Fd_To_Member.find(fd) != Fd_To_Member.end()) return true; return false;}
+            bool Exist(int fd) const & {if(Fd_To_Member.find(fd) != Fd_To_Member.end()) return true; return false;}
 
         private:
             std::unique_ptr<TimerWheel> Timer_Wheel_;
             Epoll& _Epoll_;
-            std::unordered_map<int,std::unique_ptr<Member>> Fd_To_Member;
+            std::unordered_map<int, std::unique_ptr<Member>> Fd_To_Member;
     };
 }
 

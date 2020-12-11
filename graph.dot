@@ -1,8 +1,11 @@
 digraph config{
-    WS -> {Manger,Epoll,Server}
+    WS -> {channel_helper, Server}  // Manger,Epoll,Server这三个确实有，但是加上影响图的绘制；
+    channel_helper -> {channel, channel, channel}
+    channel -> {Manger,Epoll}
     Epoll -> {EpollEvent_Result}
     EpollEvent_Result -> {EpollEvent}
     Server ->{Socket,Address}
+    Socket -> {Extrabuf}
     Manger -> {Member,Epoll,EpollEventType}
     Member -> {HttpParser,HttpRequest,Socket,WriteLoop,ContentProvider,UserBuffer}
     ContentProvider -> {Reaprovider,HttpRequest,WriteLoop}

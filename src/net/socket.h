@@ -37,34 +37,38 @@ namespace ws{
             void init(){
                 extrabuf = std::make_unique<char[]>(4048);
                 ExtrabufPeek = static_cast<int>(VAILD);
-            }
-            char* Get_ptr() const noexcept{
-                return extrabuf.get();
+                highWaterMarkCallback_ = []{};  // 默认的高水位回调为空 
             }
 
-            int Get_length() const noexcept{
+            // 返回buffer的起始地址
+            char* Get_ptr() const noexcept {
+                return extrabuf.get() + ExtrabufPeek;
+            }
+
+            int Get_length() const & noexcept{
                 return ExtrabufPeek;
             }
 
             void Write(int spot) noexcept {
-                ExtrabufPeek = spot;
+                ExtrabufPeek += spot;
             }
 
-            int WriteAble() const noexcept{
+            int WriteAble() const & noexcept{
                 return BufferSize - ExtrabufPeek;
             }
 
-            bool IsVaild() const noexcept{
+            bool IsVaild() const & noexcept{
                 return ExtrabufPeek == INVAILD ? false : true;
-                //return static_cast<bool>(ExtrabufPeek);
+                // return static_cast<bool>(ExtrabufPeek);
             }
 
             bool Reset(){
                 std::unique_ptr<char[]> TempPtr = std::make_unique<char[]>(BufferSize);
-                memcpy(TempPtr.get(), extrabuf.get(), BufferSize);
-                extrabuf.reset(new char[BufferSize*2]);
-                memcpy(extrabuf.get(), TempPtr.get(), BufferSize);
-                BufferSize*=2;
+                auto vaildLength = WriteAble();
+                memcpy(TempPtr.get(), extrabuf.get(), vaildLength);
+                extrabuf.reset(new char[BufferSize * 2]);
+                memcpy(extrabuf.get(), TempPtr.get(), vaildLength);
+                BufferSize *= 2;
                 return true;
             }
 
@@ -80,11 +84,11 @@ namespace ws{
                 if(highWaterMarkCallback_) highWaterMarkCallback_();
             }
         private:
-            static const int highWaterMark_ = 64*1024*1024;
-            std::function<void()> highWaterMarkCallback_;
-            std::unique_ptr<char[]> extrabuf = nullptr; 
-            int ExtrabufPeek = static_cast<int>(isvaild::INVAILD);
-            int BufferSize = 4048;
+            static const int highWaterMark_ = 64*1024*1024;         // 64MB
+            std::function<void()> highWaterMarkCallback_;           // 高水位回调,缓冲区超过highWaterMark_被触发
+            std::unique_ptr<char[]> extrabuf = nullptr;             // buffer本身
+            int ExtrabufPeek = static_cast<int>(isvaild::INVAILD);  // ExtrabufPeek可以充当两个作用。缓冲区是否有效；buffer偏移范围；
+            int BufferSize = 4048;                                  // 额外buffer大小
     };
 
     class Socket : public Havefd,Copyable{

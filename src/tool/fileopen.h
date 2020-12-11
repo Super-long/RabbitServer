@@ -21,6 +21,7 @@
 
 namespace ws{
 
+// 协助解决busy_loop;需要与机器核数相同的文件描述符才可以；
 class fileopen : public Nocopy{
 private:
     std::mutex mutex_;
@@ -43,7 +44,7 @@ public:
 
 class fileopen_helper{
 private:
-fileopen& File_;
+    fileopen& File_;
 public:
     explicit fileopen_helper(fileopen& File) : File_(File){
         File_.Close();

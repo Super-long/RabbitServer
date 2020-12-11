@@ -53,8 +53,8 @@ namespace ws{
             EpollEvent(const Havefd& Hf, EpollEventType EET) : 
                 event_(epoll_event{EET, {.fd = Hf.fd()}}){} //这样可以被Havefd的派生类构造 其中包含fd 可行
 
-            bool check(EpollEventType EET) noexcept {return event_.events & EET;}
-            bool check(std::initializer_list<EpollEventType> EET) noexcept {
+            bool check(EpollEventType EET) const noexcept {return event_.events & EET;}
+            bool check(std::initializer_list<EpollEventType> EET) const noexcept {
                 for(auto T : EET){
                     if(!(event_.events & T)) return false;
                 }
