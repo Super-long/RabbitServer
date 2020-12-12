@@ -16,9 +16,10 @@
 #include "../../base/config.h" 
 #include "provider.h"
 #include "../../http/httpstatus.h"
+#include "mime.cc"
 
 namespace ws{
-    bool Provider::IsFilename(char x) const {
+    bool constexpr Provider::IsFilename(char x){
         return !(x == '?' || x == '\\' || x == '/' || x == '*' ||
         x == '\"' || x == '\'' || x == '<' || x == '>' || x == '|');
     }
@@ -26,7 +27,7 @@ namespace ws{
     int Provider::WriteHead(int ma, int mi, const HttpStatusCode& code){
         auto T = static_cast<int>(code);
         int ret = _Write_Loop_->swrite("HTTP/%d.%d %d %s\r\n",ma, mi, T, StatusCode_to_String(T));
-        ret += _Write_Loop_->swrite("Server: Y_Dragon %s\r\n",Y_Dragon::Version());
+        ret += _Write_Loop_->swrite("Server: RabbitServe(Y_Dragon) %s\r\n",Y_Dragon::Version());
         return ret;
     }
 
@@ -50,17 +51,22 @@ namespace ws{
         return _Write_Loop_->swrite("/r/n", 2);
     } 
 
+    /**
+     * @return: 写入缓冲区字节数；
+     * @notes:  默认的响应报文部分;
+    */
     int Provider::RegularProvide(long Content_Length, const char* Content_Type){
         int ret = WriteHead(_Request_->Return_Version_Ma(),_Request_->Return_Version_Mi(),
         _Request_->Return_Statuscode());
         ret += WriteDate();
         ret += WriteConnection(); 
         ret += WriteItem("Content-Type: %s", Content_Type); //类型未完成
-        ret += WriteItem("Content-Length %s", std::to_string(Content_Length).c_str());
+        ret += WriteItem("\nContent-Length: %s", std::to_string(Content_Length).c_str());
+        ret += WriteItem("\nContent-Language: %s", "en-US");  // 语言这一项后面再改吧，目前默认en-US
         return ret;
     }
 
-    const char* Provider::AutoAdapt() const{
+    std::string Provider::AutoAdapt() const {
         const char* Start = _Request_->Return_Uri().ReadPtr() +_Request_->Return_Uri().Length();
         const char* End = Start;
 
@@ -72,19 +78,20 @@ namespace ws{
                 End = Start;
             }
         }
-        //TODO 类型修改
-        //if(Start == temp) std::cout << "defaultmime\n";
-        //return Start == temp ? defaultMIME() : MIME(Start, std::distance(Start, End));
-        return defaultMIME();
+        
+        return Start == temp ? defaultMIME() : MIME(Start, std::distance(Start , End));
     }
 
+    // 供外界调用的接口
     int Provider::RegularProvide(long Content_Length){
-        return RegularProvide(Content_Length, AutoAdapt());
+        return RegularProvide(Content_Length, AutoAdapt().c_str());
     }
 
-    //TODU 类型在csdn收藏中 需要正则去处理文件
-    const char* Provider::MIME(const char* type, ptrdiff_t len) const{
-        return nullptr;
+    FastFindMIMEMatcher FindMIME;   // 搞个全局变量，设计其实有点问题，放到provider其实更合适
+
+    std::string Provider::MIME(const char* type, ptrdiff_t len) const{
+        auto res = FindMIME.get(std::string(type, len));
+        return res == std::string("nullptr") ? nullptr : res;
     }
 
     int Provider::ProvideError(){

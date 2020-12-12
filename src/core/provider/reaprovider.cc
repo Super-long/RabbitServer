@@ -23,7 +23,11 @@
 
 namespace ws{
 
-    void REAProvider::provide(){ 
+    /**
+     * @notes: 根据状态机解析的不同结果，执行不同的行为；
+    */
+    // TODO 这里搞一个信号槽也许是个更好的选择，但是现在能跑，目前也就不想那么多了；
+    void REAProvider::provide(){
         std::shared_ptr<FileReader> file = nullptr; 
 
         if(_Request_->Return_Method() == HRPost){ //fastcgi.

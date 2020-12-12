@@ -34,12 +34,14 @@ namespace ws{
         //Request_Result->Set_CStart(Parser_Result);
         Request_Result->Set_CLength(Parser_Result->Content_length);
         Request_Result->Set_Method(Parser_Result->method);
-        Request_Result->Set_Flag(Parser_Result->Set_Ka);
+        Request_Result->Set_Flag(Parser_Result->Set_Ka);    // keepalive还是close
         //Request_Result->Set_StatusCode(Parser_Result->Status);
 
         Request_Result->Set_Fault(Parser_Result->Fault);
-        if(Parser_Result->Uri != nullptr)
-        Request_Result->Set_Uri({Parser_Result->Uri, Parser_Result->Uri_length});
+        if(Parser_Result->Uri != nullptr){
+            Request_Result->Set_Uri({Parser_Result->Uri, Parser_Result->Uri_length});
+        }
+        
         Request_Result->Set_Request_Buffer(User_Buffer_);
 
         return true;
@@ -48,6 +50,7 @@ namespace ws{
     HttpParserFault HttpParser::Starting_Parser(){
         if(!Parser_able()){
             // 缓冲区内数据太少，无法成功解析
+            // TODO 这里应该直接退出的
             Parser_Result->Fault = HPFToLittleMessage;
         }
         
@@ -59,6 +62,8 @@ namespace ws{
             if(Parser_Result->Content_length != User_Buffer_->Readable() - 1)
                 Parser_Result->Fault = HPFContent_Nonatch_Length;
         } */
+        
+        // 把Parser_Result中的一些必要的状态转移到Request_Result中
         SetRequesting();
         return Parser_Result->Fault;
     }
@@ -146,7 +151,7 @@ namespace ws{
                     If_Conversion((ch == LF), HPSLF);
                     Set_Fault(HPFInvaildVersion);
                 case HPSLF:
-                    If_Conversion(ch == CR, HPSCRLFCR); // 这地方感觉解的有问题，换行只解了一个LR
+                    If_Conversion(ch == CR, HPSCRLFCR); // TODO 2020.12.12: 这地方以前解的有问题啊，换行只解了一个LR
                     If_Con_Exe(isheader(ch), HPSHeader, Parser_Result->Header = User_Buffer_->ReadPtr(););
                     Set_Fault(HPFInvaildHeader);
                 case HPSCRLFCR:

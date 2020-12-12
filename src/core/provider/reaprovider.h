@@ -32,7 +32,7 @@ namespace ws{
                         Provider(Hr, Wl){}
             void provide() final;
         private: 
-            bool FileProvider(std::shared_ptr<FileReader>& file);
+            bool FileProvider(std::shared_ptr<FileReader>& file); 
     };
 
 }

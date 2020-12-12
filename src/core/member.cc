@@ -30,11 +30,11 @@ namespace ws{
 
         // step3: 开始http解析
         Http_Parser_->Starting_Parser(); 
-        if(Http_Parser_->Finished()){
-            Content_Provider_->Provide(); 
+        if(Http_Parser_->Finished()){       // 不等于HFSOK证明至少解析了一项，也就是者少解析已经开始，成不成功就不一定了；
+            Content_Provider_->Provide();   // Http_Request_和Write_Loop_都在Content_Provider_中；Http_Request_其中存储着解析http报文的状态
         }
 
-        if( Write_Loop_->DoAll() != WriteLoop::IMCOMPLETE){
+        if(Write_Loop_->DoAll() != WriteLoop::IMCOMPLETE){ 
             WriteComplete = true;
         }
     } 
@@ -49,10 +49,10 @@ namespace ws{
  
     void Member::Init(){ //TODO buffer需要修改
         // 4048限制了接收包的大小
-        User_Buffer = std::make_shared<UserBuffer>(4048);//inputbuffer
+        User_Buffer = std::make_shared<UserBuffer>(4048);       //inputbuffer
         Http_Request_ = std::make_shared<HttpRequest>();
         Http_Parser_ = std::make_unique<HttpParser>(User_Buffer, Http_Request_ ,Socket_Ptr->ReturnExtraBuffer()); 
-        Write_Loop_ = std::make_shared<WriteLoop>(fd(), 4048); //outputbuffer
+        Write_Loop_ = std::make_shared<WriteLoop>(fd(), 4048);  //outputbuffer
         Content_Provider_ = std::make_unique<ContentProvider>(Http_Request_, Write_Loop_);
     }
 

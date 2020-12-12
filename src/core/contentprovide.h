@@ -14,7 +14,7 @@
 */
 
 #ifndef CONTENTPROVIDER_H_
-#define CONTENTPROVIDER_H_
+#define CONTENTPROVIDER_H_ 
 
 #include "../base/nocopy.h"
 #include "../net/writeloop.h"

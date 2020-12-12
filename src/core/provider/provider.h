@@ -24,6 +24,11 @@
 #include <iostream>
 
 namespace ws{
+    /*
+     * @function: 根据解析的结果把响应报文写到writeloop中;
+     * @notes: 这里使用一个纯虚函数是因为考虑到provider的provide可能会有多种不同的可能性，且单一个Provider没有什么意义；
+     * 当然使得类的负载更重了，但是效率没有什么影响;
+     * */
     class Provider : public Copyable{
         public:
             Provider(std::shared_ptr<HttpRequest> Hr,
@@ -38,15 +43,16 @@ namespace ws{
             int RegularProvide(long Content_Length);
             int RegularProvide(long Content_Length, const char*); 
                                         //long int
-            const char* MIME(const char*, ptrdiff_t) const;
-            const char* AutoAdapt() const;//用于指定响应数据的类型和编码
-            constexpr const char* defaultMIME() const{return "text/html\n";}
-            bool Good() const {return _Request_->Request_good();} 
-            bool IsFilename(char) const;
+            std::string MIME(const char*, ptrdiff_t) const;
+            std::string AutoAdapt() const;//用于指定响应数据的类型和编码
+            bool Good() const {return _Request_->Request_good();}
+
+            static std::string defaultMIME() {return "text/html\n";}
+            static constexpr bool IsFilename(char);
  
             virtual void provide() = 0;
-        protected:
 
+        protected:
             std::shared_ptr<HttpRequest> _Request_;
             std::shared_ptr<WriteLoop> _Write_Loop_;
     };

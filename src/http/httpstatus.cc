@@ -17,6 +17,7 @@
 
 namespace ws{
     
+    //For debugging
     std::ostream& operator<<(std::ostream& os, const HttpParser_Content& para){
         using std::endl;
         os << "method : " << static_cast<int>(para.method) << endl;
@@ -28,6 +29,6 @@ namespace ws{
         os << "Set_ka  : " << static_cast<int>(para.Set_Ka) << endl; 
         //os << "uri    : " << para.Uri << endl;
         os << "uri_length : " << para.Uri_length << endl;
-        //For debugging
+        return os;
     }
 }

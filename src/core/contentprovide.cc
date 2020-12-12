@@ -19,7 +19,8 @@
 namespace ws{
 
 void ContentProvider::Provide(){
-    if(!Pro) Pro = std::make_unique<REAProvider>(Http_Request, Write_Loop);
+    // 延迟绑定，因为创建的时候数据还没准备好
+    if(!Pro) Pro = std::make_unique<REAProvider>(Http_Request, Write_Loop); 
     Pro->provide(); 
 }
 
