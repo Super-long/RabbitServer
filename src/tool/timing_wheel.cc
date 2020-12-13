@@ -27,10 +27,10 @@ namespace ws{
 #define FIRST_INDEX(v) ((v) & TVR_MASK)
 #define NTH_INDEX(v, n) (((v) >> (TVR_BITS + (n) * TVN_BITS)) & TVN_MASK)
 
-void TimerWheel::TW_Add(int fd, Fun para, int ticks){
+void TimerWheel::TW_Add(int fd, Fun fun, int ticks){
     if(ticks < 0) throw std::invalid_argument("'Timer_Wheel::TW_Add' : error parameter."); 
     int ex = currenttime + ticks;
-    _TW_Add_(fd, ex, para);
+    _TW_Add_(fd, ex, fun);
 }
 
 void TimerWheel::_TW_Add_(int fd, int ex, Fun& para){

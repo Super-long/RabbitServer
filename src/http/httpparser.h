@@ -32,8 +32,12 @@ namespace ws{
                 User_Buffer_(std::move(ptr)),Parser_Result(std::make_unique<HttpParser_Content>()),Request_Result(request),Extrabuffer_(extra){}
 
             void Again_Parser(); 
-            HttpParserFault Starting_Parser(); 
-            bool Finished() const{ return Parser_Result->Fault != HPFOK;}
+            HttpParserFault Starting_Parser();
+            bool Finished() const {
+                // Faulth初始值是HPFOK
+                return Parser_Result->Fault == HPFContent;
+                //return Parser_Result->Fault != HPFOK;
+                }
             
             bool SetRequesting();
 

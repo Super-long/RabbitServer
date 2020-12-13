@@ -28,30 +28,31 @@
 
 namespace ws{
 
+    // WriteLoop本质上是把数据全部放在缓冲区中；
     class WriteLoop : public Nocopy, public Havefd{
         public:
             enum COMPLETETYPE {IMCOMPLETE, COMPLETE, EMPTY};
             using Task = std::function<WriteLoop::COMPLETETYPE()>;
 
-            WriteLoop(int fd, int length) : fd_(fd),User_Buffer_(std::make_unique<UserBuffer>(length)){} 
+            explicit WriteLoop(int fd, int length = 4096) : fd_(fd),User_Buffer_(std::make_unique<UserBuffer>(length)){} 
             int fd() const & override{return fd_;}
 
-            int write(int bytes) {return User_Buffer_->Write(bytes);}
-            int write(char* buf, int bytes) {return User_Buffer_->Write(buf, bytes);}
+            int write(int bytes) {return User_Buffer_->Write(bytes);}   // 仅增加长度
+
+            int write(char* buf, int bytes) {return User_Buffer_->Write(buf, bytes);}   // 这两个其实一样，一般的指针可以向顶层const转换
             int write(const char* buf, int bytes) {return User_Buffer_->Write(buf, bytes);}
             int write(const std::string& str) {return User_Buffer_->Write(str);}
             int swrite(const char* format, ...);
 
-            int writeable() const{return User_Buffer_->Writeable();}
+            int writeable() const{return User_Buffer_->Writeable();} 
             void Move_Buffer() {User_Buffer_->Move_Buffer();}
             size_t WSpot() const noexcept {return User_Buffer_->WSpot();}
             void Rewrite(int spot) noexcept {return User_Buffer_->ReWirte(spot);}
- 
-            void AddTask(int len){Que.emplace_back([this, len]{return Send(len);});}
-            void AddTask() {AddTask(User_Buffer_->Readable());}
              
             void AddSend(int length){Que.emplace_back([this, length]{return Send(length);});}
             void AddSend(){Que.emplace_back([this]{return Send(User_Buffer_->Readable());});}
+
+            // 用lamda代替bind，事实上在cpp14 bind已经没有什么用了；
             void AddSendFile(std::shared_ptr<FileReader> ptr){Que.emplace_back([this, ptr]{return SendFile(ptr);});}
 
             COMPLETETYPE DoFirst();

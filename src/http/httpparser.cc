@@ -62,11 +62,32 @@ namespace ws{
             if(Parser_Result->Content_length != User_Buffer_->Readable() - 1)
                 Parser_Result->Fault = HPFContent_Nonatch_Length;
         } */
-        
+
         // 把Parser_Result中的一些必要的状态转移到Request_Result中
         SetRequesting();
         return Parser_Result->Fault;
     }
+
+//                            _ooOoo_  
+//                           o8888888o  
+//                           88" . "88  
+//                           (| -_- |)  
+//                            O\ = /O  
+//                        ____/`---'\____  
+//                      .   ' \\| |// `.  
+//                       / \\||| : |||// \  
+//                     / _||||| -:- |||||- \  
+//                       | | \\\ - /// | |  
+//                     | \_| ''\---/'' | |  
+//                      \ .-\__ `-` ___/-. /  
+//                   ___`. .' /--.--\ `. . __  
+//                ."" '< `.___\_<|>_/___.' >'"".  
+//               | | : `- \`.;`\ _ /`;.`/ - ` : | |  
+//                 \ \ `-. \_ __\ /__ _/ .-` / /  
+//         ======`-.____`-.___\_____/___.-`____.-'======  
+//                            `=---='  
+//         .............................................  
+//                  佛祖保佑             永无BUG 
 
     // 执行完Parsering以后如果解析成功请求头已经存储在Request_Result中了，其中状态机状态和解析结果存在Parser_Result中；
     bool HttpParser::Parsering(){

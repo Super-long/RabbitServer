@@ -19,7 +19,7 @@
 #include "fileproxy.h"
 #include <string>  
 
-namespace ws{
+namespace ws{ 
     class FileReader : public FileProxy{ 
         public:
             explicit FileReader(const char* path) : FileProxy(path){}
@@ -27,11 +27,11 @@ namespace ws{
             FileReader(const FileProxy& proxy, const std::string& str) : FileProxy(proxy, str.c_str()){}
 
             ssize_t SendFile(int Socket_Fd);
-            bool Send_End() const{ return length == offest;}
+            bool Send_End() const & { return length == offest;}
 
         private:
-            __off_t length = FileSize(); 
-            __off_t offest = 0;
+            __off_t length = FileSize();    // 先构造基类
+            __off_t offest = 0;             // 目前sendfile的发送偏移量
     };
 }
 

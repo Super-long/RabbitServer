@@ -60,9 +60,9 @@ namespace ws{
         _Request_->Return_Statuscode());
         ret += WriteDate();
         ret += WriteConnection(); 
-        ret += WriteItem("Content-Type: %s", Content_Type); //类型未完成
+        ret += WriteItem("Content-Type: %s", Content_Type);     // 类型未完成
         ret += WriteItem("\nContent-Length: %s", std::to_string(Content_Length).c_str());
-        ret += WriteItem("\nContent-Language: %s", "en-US");  // 语言这一项后面再改吧，目前默认en-US
+        ret += WriteItem("\nContent-Language: %s", "en-US");    // 语言这一项后面再改吧，目前默认en-US
         return ret;
     }
 
@@ -78,7 +78,7 @@ namespace ws{
                 End = Start;
             }
         }
-        
+
         return Start == temp ? defaultMIME() : MIME(Start, std::distance(Start , End));
     }
 
@@ -87,16 +87,30 @@ namespace ws{
         return RegularProvide(Content_Length, AutoAdapt().c_str());
     }
 
-    FastFindMIMEMatcher FindMIME;   // 搞个全局变量，设计其实有点问题，放到provider其实更合适
+    // 这段代码的确很挫，我知道你知道，先不要骂我2B，请先接着往下看;
+    FastFindMIMEMatcher FindMIME;   // 搞个全局变量，设计其实有点问题，放到provider其实更合适，但是我不想改了；
 
     std::string Provider::MIME(const char* type, ptrdiff_t len) const{
         auto res = FindMIME.get(std::string(type, len));
-        return res == std::string("nullptr") ? nullptr : res;
+        return res == std::string("nullptr") ? nullptr : res;   //和女朋友意见不一致的时候听她的，意见一致的时候听我的。啊，不小心忘了我没有女朋友；
     }
 
+    constexpr size_t Getstrlen(const char* str){
+        if(str == nullptr) return 0;
+        size_t len = 0;
+        char ch = *str;
+        while(ch != '\0'){
+            len++;
+            str++;
+            ch = *str;
+        }
+        return len;
+    } 
+
     int Provider::ProvideError(){
-        static constexpr const char temp[] = "<html><head><title>Dragon/HTTP Error</title></head>";
-        size_t len = strlen(temp);
+        static constexpr const char temp[] = "<html><head><title>RabbitServer/HTTP Error</title></head>";
+        auto len = Getstrlen(temp);
+        //size_t len = strlen(temp);
         _Request_->Set_StatusCode(HSCBadRequest);
         int ret = RegularProvide(len - 1);
         ret += WriteCRLF();

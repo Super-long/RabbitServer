@@ -56,7 +56,7 @@ void looping(std::promise<std::queue<int>*>& pro, int eventfd){
                 }
             }
         }catch(...){
-            std::cerr << "error in : " << std::this_thread::get_id() << std::endl;  //log_fatal
+            std::cerr << "Error in : " << std::this_thread::get_id() << std::endl;  //log_fatal
         }
     }
     // 此时线程结束,此时我们应该在分发函数中检查每个线程结构是否是有效的； 

@@ -21,38 +21,39 @@
 
 namespace ws{
 
-// 协助解决busy_loop;需要与机器核数相同的文件描述符才可以；
-class fileopen : public Nocopy{
-private:
-    std::mutex mutex_;
-    int File_Description;
-    constexpr const static char* prevent_busyloop = "/dev/null";
-public:
-    //https://blog.csdn.net/wdzxl198/article/details/6876879
-    fileopen() : File_Description(::open(prevent_busyloop, O_RDONLY | O_CREAT | O_EXCL)){}
+    // 协助解决busy_loop;多线程需要与机器核数相同的文件描述符才可以，但是单线程当然一个文件描述符就OK；
+    // 这里其实所起的o作用和我开始想的不太一样，所以其实把锁去掉也是OK的。
+    class fileopen : public Nocopy{
+        private:
+            std::mutex mutex_;
+            int File_Description;
+            constexpr const static char* prevent_busyloop = "/dev/null";
+        public:
+            //https://blog.csdn.net/wdzxl198/article/details/6876879
+            fileopen() : File_Description(::open(prevent_busyloop, O_RDONLY | O_CREAT | O_EXCL)){}
 
-    void Close(){
-        std::lock_guard<std::mutex> guard(mutex_); //It will be slow, but it must not ne wrong.
-        ::close(File_Description);
-    }
+            void Close(){
+                std::lock_guard<std::mutex> guard(mutex_); //It will be slow, but it must not ne wrong.
+                ::close(File_Description);
+            }
 
-    void Open(){
-        std::lock_guard<std::mutex> guard(mutex_);
-        ::open(prevent_busyloop,O_RDONLY);
-    }
-};
+            void Open(){
+                std::lock_guard<std::mutex> guard(mutex_);
+                ::open(prevent_busyloop,O_RDONLY);
+            }
+    };
 
-class fileopen_helper{
-private:
-    fileopen& File_;
-public:
-    explicit fileopen_helper(fileopen& File) : File_(File){
-        File_.Close();
-    }
+    class fileopen_helper{
+        private:
+            fileopen& File_;
+        public:
+            explicit fileopen_helper(fileopen& File) : File_(File){
+                File_.Close();
+            }
 
-    ~fileopen_helper(){
-        File_.Open();
-    }
-};
+            ~fileopen_helper(){
+                File_.Open();
+            }
+    };
 
 }

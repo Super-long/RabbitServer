@@ -53,13 +53,13 @@ namespace ws{
 
             TimerWheel() : currenttime(0){} 
 
-            void TW_Add(int fd, Fun, int ticks = 2);
+            void TW_Add(int fd, Fun fun, int ticks = 2);
             void TW_Tick();
             void TW_Update(int fd); 
 
         private:
             std::unordered_map<int, itr> mp;
-            void _TW_Add_(int fd, int ex, Fun&);
+            void _TW_Add_(int fd, int ex, Fun&); 
             uint32_t currenttime;
             TVN_ tvroot;
             TVR_ tv[4];

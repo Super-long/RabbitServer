@@ -15,9 +15,10 @@
 
 #include "filereader.h"
 #include <sys/sendfile.h>
-namespace ws{
+namespace ws{ 
 
     ssize_t FileReader::SendFile(int Socket_Fd){
+        // 第三个参数为nullptr默认从文件起始开始；
         return sendfile(Socket_Fd, fd(), &offest,length - offest);
     }
 

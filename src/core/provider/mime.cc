@@ -17,6 +17,8 @@
 #include <string>
 #include "../../base/nocopy.h"
 
+// 对这个文件有什么疑问请看最下面的注释
+
 namespace ws{
 
 class FastFindMIMEMatcher : public Nocopy{
@@ -733,3 +735,5 @@ class FastFindMIMEMatcher : public Nocopy{
 };
 
 }
+
+// 对这个文件有什么疑问请看最上面的注释

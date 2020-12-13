@@ -39,7 +39,7 @@ namespace ws{
             int Opera_Member(std::unique_ptr<Member>&&, EpollEventType&);
             
             // 在使用的时候是信号驱动，当然可以使用signalfd，把信号驱动修改为事件驱动；
-            void TimeWheel(int fd);
+            void InsertTimeWheel(int fd);
 
             void Reading(int fd, long time = -1);
             void Writing(int fd, long time = -1);

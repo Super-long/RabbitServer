@@ -54,38 +54,43 @@ namespace ws{
             throw std::invalid_argument("'Manger::Remove' Don't have this fd.");
         }
         _Epoll_.Remove(*Fd_To_Member[fd],EpollTypeBase());
-        Fd_To_Member.erase(fd);
+        return Fd_To_Member.erase(fd);
     }
 
     int Manger::Update(int fd){
         if(!Exist(fd)){
             throw std::invalid_argument("'Manger::Update' Don't have this fd.");
         }
-        _Epoll_.Modify(*Fd_To_Member[fd],EpollCanRead());
+        return _Epoll_.Modify(*Fd_To_Member[fd],EpollCanRead());
     }
 
     int Manger::UpdateWrite(int fd){
         if(!Exist(fd)){
             throw std::invalid_argument("'Manger::Update' Don't have this fd.");
         }
-        _Epoll_.Modify(*Fd_To_Member[fd],EpollCanWite());  
+        return _Epoll_.Modify(*Fd_To_Member[fd],EpollCanWite());  
     }
 
+    /**
+     * @notes: 可写事件进入这里的时候如果写完会从后两个判断出去，取决于连接状态，因为确定包是收全的；
+    */
     int Manger::JudgeToClose(int fd){   // 函数没有返回值
         if(!Exist(fd)){
             throw std::invalid_argument("'Manger::JudgeToClose' Don't have this fd.");
         }
-        auto& T = Fd_To_Member[fd];
-        if(!T->IsWriteComplete()){
+        auto& OneMember = Fd_To_Member[fd];
+        if(!OneMember->IsWriteComplete()){  // 解析成功，缓冲区写入未完成
+            // 注册可写事件，等待套接字可写
             UpdateWrite(fd);
             return 0;
-        } else if(T->CloseAble()){
+        } else if (OneMember->CloseAble()){
             _Epoll_.Remove(static_cast<EpollEvent>(fd));
             auto temp = Fd_To_Member.find(fd);
             Fd_To_Member.erase(fd);   
-        }else{
+        } else {    // 解析失败，包没收全；或者包收全，状态为keep-alive
             Update(fd);
         }
+        return 0;   // 设计失误
     }
  
     void Manger::Reading(int fd, long _time_){ 
@@ -94,15 +99,13 @@ namespace ws{
         }
         auto& user = Fd_To_Member[fd];
         user->DoRead();
-        
-        user->Touch(_time_);
     } 
 
-    void Manger::TimeWheel(int fd){
+    void Manger::InsertTimeWheel(int fd){
         using std::placeholders::_1; 
         if(Exist(fd)) Timer_Wheel_->TW_Update(fd);
         else Timer_Wheel_->TW_Add(fd, std::bind(&Manger::Remove, this, _1));
-    } 
+    }
 
     void Manger::Writing(int fd, long time){
         if(!Exist(fd)){

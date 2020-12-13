@@ -18,6 +18,37 @@
 #include <cstdarg>
 #include <sys/socket.h>
 
+/*
+                                   .. .vr       
+                                 qBMBBBMBMY     
+                                8BBBBBOBMBMv    
+                              iMBMM5vOY:BMBBv        
+              .r,             OBM;   .: rBBBBBY     
+              vUL             7BB   .;7. LBMMBBM.   
+             .@Wwz.           :uvir .i:.iLMOMOBM..  
+              vv::r;             iY. ...rv,@arqiao. 
+               Li. i:             v:.::::7vOBBMBL.. 
+               ,i7: vSUi,         :M7.:.,:u08OP. .  
+                 .N2k5u1ju7,..     BMGiiL7   ,i,i.  
+                  :rLjFYjvjLY7r::.  ;v  vr... rE8q;.:,, 
+                 751jSLXPFu5uU@guohezou.,1vjY2E8@Yizero.    
+                 BB:FMu rkM8Eq0PFjF15FZ0Xu15F25uuLuu25Gi.   
+               ivSvvXL    :v58ZOGZXF2UUkFSFkU1u125uUJUUZ,   
+             :@kevensun.      ,iY20GOXSUXkSuS2F5XXkUX5SEv.  
+         .:i0BMBMBBOOBMUi;,        ,;8PkFP5NkPXkFqPEqqkZu.  
+       .rqMqBBMOMMBMBBBM .           @kexianli.S11kFSU5q5   
+     .7BBOi1L1MM8BBBOMBB..,          8kqS52XkkU1Uqkk1kUEJ   
+     .;MBZ;iiMBMBMMOBBBu ,           1OkS1F1X5kPP112F51kU   
+       .rPY  OMBMBBBMBB2 ,.          rME5SSSFk1XPqFNkSUPZ,.
+              ;;JuBML::r:.:.,,        SZPX0SXSP5kXGNP15UBr.
+                  L,    :@huhao.      :MNZqNXqSqXk2E0PSXPE .
+              viLBX.,,v8Bj. i:r7:,     2Zkqq0XXSNN0NOXXSXOU 
+            :r2. rMBGBMGi .7Y, 1i::i   vO0PMNNSXXEqP@Secbone.
+            .i1r. .jkY,    vE. iY....  20Fq0q5X5F1S2F22uuv1M; 
+
+            小伙子，小姑娘后悔自己没有好好学习了吧 
+*/
+
 namespace ws{
     int WriteLoop::swrite(const char* format, ...){
         va_list va;
@@ -28,17 +59,27 @@ namespace ws{
         return ret;
     }
 
+    /**
+     * @param: length为要发送数据的长度
+    */
     WriteLoop::COMPLETETYPE WriteLoop::Send(int length){
         if(length < 1) throw std::invalid_argument("'WriteLoop::Send' error parameter.");
         int sent_ = 0;
-        for(int ans;length - sent_ && (ans = static_cast<int>(send(fd_, User_Buffer_->ReadPtr(),length - sent_, 0))) > 0;){
-            sent_ += ans;
+
+        for(int ans;
+            length - sent_          // 有一次发送失败就退出循环，原因是内核写入队列已满，不应该空转等待；ENOBUFS
+            && (ans = static_cast<int>(send(fd_, User_Buffer_->ReadPtr(),length - sent_, 0))) > 0;){
+                sent_ += ans;
         }
-        User_Buffer_->read(sent_);
+
+        User_Buffer_->read(sent_);  // 一个http响应报文至少需要两次send，所以缓冲区需要记录长度；
         int Remaining = length - sent_; 
         bool faultError = false;
-        if (errno != EWOULDBLOCK){
-            if (errno == EPIPE || errno == ECONNRESET){//服务端收到RST报文后 write出现EPIPE recv出现ECONNRESET
+        // https://man7.org/linux/man-pages/man2/send.2.html
+        if (errno != EWOULDBLOCK && errno != EAGAIN){
+            if (errno == EPIPE || errno == ECONNRESET){
+                // 服务端收到RST报文后recv出现ECONNRESET;向一个已关闭的套接字写数据的时候出现EPIPE；
+                // 此时显然我们没有必要再去维护发送缓冲区了，直接返回true就可以了，因为这个套接字已经无效了；
                 faultError = true;
             }
         }
@@ -68,7 +109,10 @@ namespace ws{
         return EMPTY;
     }
 
-    WriteLoop::COMPLETETYPE WriteLoop::DoAll(){
+    /**
+     * @notes: 可能返回IMCOMPLETE和EMPTY，即失败与成功，需要函数调用方判断；
+    */
+    WriteLoop::COMPLETETYPE WriteLoop::DoAll(){ 
         while(1){
             auto CompleteType = DoFirst();
             if(CompleteType == COMPLETE) continue;
