@@ -27,7 +27,7 @@
 #include "logstream.h"
 #include "timezone.h"
 
-namespace ws{
+namespace ws{ 
 
 namespace detail{
 

@@ -20,7 +20,7 @@
 
 #include "../base/nocopy.h"
 #include "../tool/userbuffer.h"
-#include "../tool/parsed_header.h"
+#include "parsed_header.h"
 #include "httpstatus.h"
 
 namespace ws{

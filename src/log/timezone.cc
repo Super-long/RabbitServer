@@ -24,7 +24,7 @@
 #include <stdio.h>
 
 #include "timezone.h"
-#include "../../base/nocopy.h"
+#include "../base/nocopy.h"
 #include "date.h"
 
 namespace ws{

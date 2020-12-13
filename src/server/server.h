@@ -16,7 +16,7 @@
 #ifndef SERVER_H_
 #define SERVER_H_
 
-#include "socket.h"
+#include "../net/socket.h"
 #include "../net/address.h"
 #include "../tool/fileopen.h"
 

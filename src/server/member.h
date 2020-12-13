@@ -25,8 +25,8 @@
 #include "../tool/userbuffer.h"
 #include "../http/httprequest.h"
 #include "../http/httpparser.h"
-#include "contentprovide.h"
-#include "../net/writeloop.h"
+#include "../http/provider/contentprovide.h"
+#include "../tool/writeloop.h"
  
 namespace ws{
     class Member : public Nocopy, public Havefd{

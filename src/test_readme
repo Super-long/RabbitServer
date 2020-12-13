@@ -30,10 +30,16 @@
  3. TCP窗口
  4. reactor的理解还不够
 
-1. 在HTTP返回中加上Content-Language:en-US 或者 zh-CN
 2. 返回中加上Allow字段
 3. 加上Content-Encoding
 4. Content-Location
 5. 貌似host功能指定的有问题
 
 [ab的用法](https://www.howtoing.com/how-to-use-apachebench-to-do-load-testing-on-an-arch-linux-vps)
+
+// boost库安装
+wget http://sourceforge.net/projects/boost/files/boost/1.54.0/boost_1_54_0.tar.gz
+tar -xzvf boost_1_54_0.tar.gz
+cd boost_1_54_0
+./bootstrap.sh --prefix=/usr/local
+sudo ./b2 install --with=all

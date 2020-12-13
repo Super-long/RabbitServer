@@ -25,7 +25,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "../../base/nocopy.h"
+#include "../base/nocopy.h"
 
 namespace ws{
 

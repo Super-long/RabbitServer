@@ -19,7 +19,7 @@
 #include <time.h>
 #include <memory>
 
-#include "../../base/copyable.h"
+#include "../base/copyable.h"
 
 namespace ws{
 

@@ -23,7 +23,7 @@
 #include <string>
 
 #include <condition_variable>
-#include "../../base/nocopy.h"
+#include "../base/nocopy.h"
 #include "Fixedbuffer.h"
   
 namespace ws{

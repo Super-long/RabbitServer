@@ -18,7 +18,7 @@
 
 #include "../../base/copyable.h"
 #include "../../http/httprequest.h"
-#include "../../net/writeloop.h"
+#include "../../tool/writeloop.h"
 #include "../../http/httpstatus.h"
 #include <memory>
 #include <iostream>

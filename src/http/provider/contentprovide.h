@@ -16,11 +16,11 @@
 #ifndef CONTENTPROVIDER_H_
 #define CONTENTPROVIDER_H_ 
 
-#include "../base/nocopy.h"
-#include "../net/writeloop.h"
-#include "../http/httprequest.h"
-#include "provider/provider.h"
-#include "provider/reaprovider.h"
+#include "../../base/nocopy.h"
+#include "../../tool/writeloop.h"
+#include "../../http/httprequest.h"
+#include "provider.h"
+#include "reaprovider.h"
 
 #include <memory>
 

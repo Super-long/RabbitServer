@@ -29,6 +29,7 @@ namespace detail{
 
         self& operator<<(bool flag){
             buffer_.append(flag ? "1" : "0", 1);
+            return *this;
         }
 
         self& operator<<(short);

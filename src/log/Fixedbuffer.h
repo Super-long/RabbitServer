@@ -22,7 +22,7 @@
 #include <algorithm>
 #include <cstring>
 
-#include "../../base/nocopy.h"
+#include "../base/nocopy.h"
 
 namespace ws{
 

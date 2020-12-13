@@ -14,7 +14,7 @@
 */
 
 #include "reaprovider.h"
-#include "../../tool/parsed_header.h"
+#include "../parsed_header.h"
 #include "../../tool/filereader.h"
 #include "../../http/httpstatus.h"
 #include "../../FastCgi/fastcgi.h"

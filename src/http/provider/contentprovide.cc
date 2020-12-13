@@ -14,7 +14,7 @@
 */
 
 #include "contentprovide.h"
-#include "provider/reaprovider.h"
+#include "reaprovider.h"
  
 namespace ws{
 

@@ -20,7 +20,7 @@
 #include <mutex>
 #include <string>
 
-#include "../../base/nocopy.h"
+#include "../base/nocopy.h"
 #include "fileappend.h"
 
 namespace ws{

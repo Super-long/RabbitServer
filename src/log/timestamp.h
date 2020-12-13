@@ -19,7 +19,7 @@
 #include <string>
 #include <algorithm>
 
-#include "../../base/copyable.h"
+#include "../base/copyable.h"
 #include <boost/operators.hpp>
 
 namespace ws{
@@ -79,6 +79,5 @@ inline Timestamp addTime(Timestamp timestamp, double seconds){
 }
 
 }
-
 
 #endif //TIMESTAMP_H_

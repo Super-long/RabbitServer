@@ -16,7 +16,7 @@
 #ifndef WS_H_
 #define WS_H_
 
-#include "../net/server.h"
+#include "server.h"
 #include "../net/epoll.h"
 #include "manger.h"
 #include "channel.h"
