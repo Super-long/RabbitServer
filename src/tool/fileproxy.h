@@ -27,7 +27,7 @@
 
 namespace ws{
 
-    class FileProxy: public Nocopy, public Havefd{ 
+    class FileProxy: public Nocopy, public Havefd{
         public:
             explicit FileProxy(const char* path) : File_Description(::open(path, O_RDONLY)){}
             FileProxy(const FileProxy&, const char*); 

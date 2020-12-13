@@ -3,7 +3,7 @@ project(Web_Server) #引入两个变量
 
 set(CMAKE_CXX_STANDARD 14)
 link_libraries(-pthread -lboost_system -lboost_thread)
-SET(CMAKE_C_FLAGS ${CMAKE_CXX_FLAGS} -g -fno-strict-aliasing -O2 -Wall -Wextra -pipe -D_GNU_SOURCE -D_REENTRANT -fPIC -Wno-deprecated -m64 -Wnonnull)  #https://gcc.gnu.org/onlinedocs/gcc-4.4.7/gcc/Warning-Options.html
+SET(CMAKE_C_FLAGS ${CMAKE_CXX_FLAGS} -g -fno-strict-aliasing -O2 -Wall -Wextra -pipe -D_GNU_SOURCE -D_REENTRANT -fPIC -Wno-deprecated -m64 -Wnonnull -D)  #https://gcc.gnu.org/onlinedocs/gcc-4.4.7/gcc/Warning-Options.html
 #add_definitions("-03")#下去搞清楚这个句子的含义 
 
 aux_source_directory(src/base WS_BASE)

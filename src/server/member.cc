@@ -21,7 +21,7 @@
 namespace ws{
     void Member::DoRead(){
         // step1: 从套接字中把数据读到Member的User_Buffer和Socket的Extrabuf中；
-        Socket_Ptr->Read(User_Buffer); 
+        Socket_Ptr->Read(User_Buffer);
 
         // TODO 有一个bug，如果包从数据部分被分开，这样就检测不到了，因为是依靠状态来判断解析是否成功的；
         // step2: 做一些解析http请求的前置工作(主要是上一次可能解析过，但是数据包不够大，导致解析失败)；
@@ -34,6 +34,8 @@ namespace ws{
         if(Http_Parser_->Finished()){       // 不等于HFSOK证明至少解析了一项，也就是者少解析已经开始，成不成功就不一定了；
             Content_Provider_->Provide();   // Http_Request_和Write_Loop_都在Content_Provider_中，这一步把响应头和请求内容插入到输出缓冲区
         }
+
+        // std::cout << "writeloop size : " << Write_Loop_->TaskQueSize() << std::endl;
 
         // step4: 将输出缓冲区内容发出去
         if(Write_Loop_->DoAll() != WriteLoop::IMCOMPLETE){ 

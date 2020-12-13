@@ -13,6 +13,23 @@ Connection: Close
 
 )";
 
+/*
+GET / HTTP/1.0
+Host: 127.0.0.1:8888
+User-Agent: ApacheBench/2.3
+Accept: ---
+
+*/
+
+/*
+GET graph.dot HTTP/1.1
+Host: /home/lizhaolong/Desktop/Exercise/RabbitServer
+User-Agent: curl/7.52.1
+Connection: Keep-Alive
+
+
+*/
+
 int main(){
     //client_.Connect();
     //sleep(1);

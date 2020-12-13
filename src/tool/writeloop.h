@@ -52,11 +52,13 @@ namespace ws{
             void AddSend(int length){Que.emplace_back([this, length]{return Send(length);});}
             void AddSend(){Que.emplace_back([this]{return Send(User_Buffer_->Readable());});}
 
-            // 用lamda代替bind，事实上在cpp14 bind已经没有什么用了；
+            // 用lamda代替bind，事实上在cpp14 bind已经没有什么用了,见Effective Modern C++ 条款34；
             void AddSendFile(std::shared_ptr<FileReader> ptr){Que.emplace_back([this, ptr]{return SendFile(ptr);});}
 
             COMPLETETYPE DoFirst();
             COMPLETETYPE DoAll();
+
+            [[deprecated]] size_t TaskQueSize() const & noexcept {return Que.size();}  // For Debugging.
  
         private:
             std::unique_ptr<UserBuffer> User_Buffer_; 

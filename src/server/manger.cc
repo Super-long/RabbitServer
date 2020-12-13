@@ -86,20 +86,20 @@ namespace ws{
         } else if (OneMember->CloseAble()){
             _Epoll_.Remove(static_cast<EpollEvent>(fd));
             auto temp = Fd_To_Member.find(fd);
-            Fd_To_Member.erase(fd);   
+            Fd_To_Member.erase(fd);
         } else {    // 解析失败，包没收全；或者包收全，状态为keep-alive
             Update(fd);
         }
         return 0;   // 设计失误
     }
  
-    void Manger::Reading(int fd, long _time_){ 
+    void Manger::Reading(int fd, long _time_){
         if(!Exist(fd)){
             throw std::invalid_argument("'Manger::Reading' Don't have this fd.");
         }
         auto& user = Fd_To_Member[fd];
         user->DoRead();
-    } 
+    }
 
     void Manger::InsertTimeWheel(int fd){
         using std::placeholders::_1; 

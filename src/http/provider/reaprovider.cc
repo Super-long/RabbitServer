@@ -99,15 +99,23 @@ namespace ws{
         //std::cout << "release1 : " << release_ptr2 << std::endl;
 
         // 参数为 路径+文件名
-        file = std::make_shared<FileReader>   
-        ( static_cast<FileProxy>(str.c_str())   // 构造函数中已经open了
-        , release_ptr2 );
+        // TODO 可以在这里设置一个类似slab的cache层，但是其实实现起来并不容易，因为每个线程一个slab就很浪费资源，但是只有一个的话线程安全的开销又比较大；
+        // 这里我们需要特判下默认的情况，即url为'/'
+        //std::cout << y.Readable() << " " << release_ptr2[0] << std::endl;
+        if(y.Readable() == 1 && release_ptr2[0] == '/'){    // 默认情况打开index.html
+            // TODO 改为相对路径
+            file = std::make_shared<FileReader>("/home/lizhaolong/Desktop/Exercise/RabbitServer/src/index.html");
+        } else {
+            file = std::make_shared<FileReader>   
+            ( static_cast<FileProxy>(str.c_str())   // 构造函数中已经open了
+            , release_ptr2 );
+        }
 
         // 下面这两条逻辑有点错乱，因为不清楚如何设置错误类型；
 
         if(!file->Fd_Good() || file->IsTextFile()){ // fd正确且文件类型正确；
             // 可能权限错误也会打开失败；
-            _Request_->Set_StatusCode(HSCForbidden); 
+            _Request_->Set_StatusCode(HSCForbidden);
             return false;
         }
 

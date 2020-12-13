@@ -42,12 +42,14 @@ namespace ws{
         //deepin 15.7 x86 long int
         ssize_t sum = 0;
         ssize_t ret = 0;
-        //char* strart = ptr->WritePtr();
+
+        char* strart = ptr->WritePtr();
+
         char* StartBuffer = ptr->WritePtr();
         while(true){
             ret = recv(Socket_fd_, StartBuffer, static_cast<size_t>(length), flag);
-            std::cout << "errno : " << errno << std::endl;
-            std::cout << "ret : " << ret << std::endl;
+/*             std::cout << "errno : " << errno << std::endl;
+            std::cout << "ret : " << ret << std::endl; */
             // ret = read(Socket_fd_,ptr->WritePtr(),static_cast<size_t>(length)); 
 
             // 显然每次length大于等于ret
@@ -77,7 +79,7 @@ namespace ws{
                     StartBuffer = ExtraBuffer_.Get_ptr();
                     length = ExtraBuffer_.WriteAble();
                 }
-            } else if (ret < 0 ){ // ret == -1
+            } else if (ret < 0){ // ret == -1
                 // https://man7.org/linux/man-pages/man2/recv.2.html
                 if(errno == EWOULDBLOCK || errno == EAGAIN)
                     break;
@@ -90,10 +92,10 @@ namespace ws{
                 }
             }
         }
-/*         std::string str(strart, ptr->Readable());
-        std::cout << "内容 : " << str[0] << " : " << str[1] << std::endl;
-        std::cout << "readable : " << ptr->Readable() << std::endl;  */
-        std::cout << "一次recv的完成 : " << sum << std::endl; 
+        std::string str(strart, ptr->Readable());
+/*         std::cout << "内容 : \n" << str << std::endl;
+        std::cout << "readable : " << ptr->Readable() << std::endl;*/
+        std::cout << "一次recv的完成 socket.cc : " << sum << std::endl;
         return static_cast<int>(sum);
     }
 

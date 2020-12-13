@@ -15,15 +15,41 @@
 
 #include "channel.h"
 #include "member.h"
+#include<sys/types.h>
+#include<sys/sysinfo.h>
+#include<sched.h>
 
 namespace ws{
 
-void looping(std::promise<std::queue<int>*>& pro, int eventfd){
+/**
+ * @notes: 用作工作线程绑核
+ * @param: 传入的参数应该小于cpu数，由调用方保证
+ * @link：https://man7.org/linux/man-pages/man2/sched_setaffinity.2.html
+*/
+bool SetCPUaffinity(int param){  //arg  传递线程标号（自己定义）
+    cpu_set_t mask;     // CPU核的集合
+    int a = param;
+
+    CPU_ZERO(&mask);    // 置空
+    CPU_SET(a,&mask);   // 设置亲和力值,把cpu加到集合中 https://man7.org/linux/man-pages/man3/CPU_SET.3.html
+    // 第一个参数为零的时候默认为调用线程
+    if (sched_setaffinity(0, sizeof(mask), &mask) == -1){   // 设置线程CPU亲和力
+        return false;
+        // 看起来五种errno没有必要处理；
+        // TODO 绑核失败意味着后面可能负载不均衡
+    } else {
+        return true;
+    }
+}
+
+void looping(std::promise<std::queue<int>*>& pro, int eventfd, int index){
+    channel rea(eventfd); //非异常安全
+    pro.set_value(rea.return_ptr());
+    rea._Epoll_.Add(rea, EpollCanRead());
+    SetCPUaffinity(index);
+
     while(true){    // 这个线程不能退出，所以搞一个死循环
         try{
-            channel rea(eventfd); //非异常安全
-            pro.set_value(rea.return_ptr());
-            rea._Epoll_.Add(rea, EpollCanRead());
             EpollEvent_Result Event_Reault(Y_Dragon::EventResult_Number());
     
             while(true){
@@ -59,18 +85,18 @@ void looping(std::promise<std::queue<int>*>& pro, int eventfd){
             std::cerr << "Error in : " << std::this_thread::get_id() << std::endl;  //log_fatal
         }
     }
-    // 此时线程结束,此时我们应该在分发函数中检查每个线程结构是否是有效的； 
+    // 此时线程结束,此时我们应该在分发函数中检查每个线程结构是否是有效的；
 }
 
 const uint64_t channel_helper::tool = 1;
 
 // 先把工作线程创建好
 void channel_helper::loop(){
-    for(unsigned int i = 0; i < ThreadNumber; i++){
+    for(unsigned int i = 0; i < RealThreadNumber; i++){
         std::promise<std::queue<int>*> Temp;
         vec.push_back(Temp.get_future());
         int fd = eventfd(0, EFD_CLOEXEC | EFD_NONBLOCK);
-        pool.push_back(std::thread(looping, std::ref(Temp), fd));
+        pool.push_back(std::thread(looping, std::ref(Temp), fd, i%ThreadNumber));
         pool.back().detach();
         store_.push_back(vec[i].get());
         eventfd_.push_back(fd);
@@ -79,11 +105,11 @@ void channel_helper::loop(){
 
 // 每到达一个连接就会使用eventfd通信一次
 // TODO 瓶颈所在，可以在一个epoll_wait循环结束以后再执行分发；
-// TODO 这里还可以根据每个线程的实际吞吐量执行更有效的负载均衡；
+// TODO 这里还可以根据每个线程的实际吞吐量执行更有效的负载均衡
 void channel_helper::Distribution(int fd){
         store_[RoundRobin]->push(fd);
         write(eventfd_[RoundRobin], &channel_helper::tool, sizeof(tool));
-        RoundRobin = (RoundRobin + 1) % ThreadNumber;
+        RoundRobin = (RoundRobin + 1) % RealThreadNumber;
 }
 
 }
