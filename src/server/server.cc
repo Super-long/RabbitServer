@@ -41,7 +41,7 @@ namespace ws{
         else if(errno == EMFILE){
             fileopen_helper prevent(FileOpen);
         } */
-        // accpect返回-1的情况 http://manpages.org/accept4/2
+        // accpect返回-1的情况 https://man7.org/linux/man-pages/man2/accept4.2.html
         // 套接字被设置成非阻塞，需要一个while循环来接收
         while(1){
             int ret = 0;
@@ -49,6 +49,7 @@ namespace ws{
             if(ret != -1){
                 // 成功以后才会分发套接字；失败直接退出就可以了；
                 f(ret);
+                break;
                 // std::cout << "已接收一个新的连接 fd : " << ret << std::endl;
             } else if (ret == -1 && errno == EMFILE){
                 // 我的架构中只有一个线程accept，所以此做法可以保证安全；
@@ -57,7 +58,7 @@ namespace ws{
                 ret = ::accept4(fd(), nullptr, nullptr, SOCK_NONBLOCK);
                 ::close(fd());
                 break;
-            } else if (ret == -1 && errno == EWOULDBLOCK){    // EWOULDBLOCK
+            } else if (ret == -1 && (errno == EWOULDBLOCK || errno == EAGAIN)){
                 continue;
             } else if (ret == -1){   // ECONNABORTED 在等待队列的时候被关闭了，不是非阻塞套及字的话会一直阻塞；进入这个条件判断可能还是一些比较扯淡的条件，具体见man手册
                 break;
@@ -84,6 +85,7 @@ namespace ws{
 
     inline int Server::Set_Linger(){
         /*
+         * 客户端收到WSAECONNRESET
         struct linger {
             int l_onoff;  0 = off, nozero = on 
             int l_linger;  linger time 

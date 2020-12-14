@@ -43,7 +43,7 @@ namespace ws{
         ssize_t sum = 0;
         ssize_t ret = 0;
 
-        char* strart = ptr->WritePtr();
+        //char* strart = ptr->WritePtr();   // For Debugging.
 
         char* StartBuffer = ptr->WritePtr();
         while(true){
@@ -92,10 +92,10 @@ namespace ws{
                 }
             }
         }
-        std::string str(strart, ptr->Readable());
+        //std::string str(strart, ptr->Readable());
 /*         std::cout << "内容 : \n" << str << std::endl;
         std::cout << "readable : " << ptr->Readable() << std::endl;*/
-        std::cout << "一次recv的完成 socket.cc : " << sum << std::endl;
+        //std::cout << "一次recv的完成 socket.cc : " << sum << std::endl;
         return static_cast<int>(sum);
     }
 

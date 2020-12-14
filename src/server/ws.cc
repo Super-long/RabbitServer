@@ -57,6 +57,10 @@ namespace ws{
             while(true){
                 //constexpr int Second = 20;
                 _Epoll_.Epoll_Wait(Event_Reault);
+                // https://man7.org/linux/man-pages/man2/epoll_wait.2.html
+                // FIX：初始没有考虑epoll_wait返回-1，但是很隐晦，在性能分析的时候需要用到信号，而在接收到信号的时候epoll_wait会被中断返回-1，errno==EINTR；
+                if(Event_Reault.size() == -1) continue; // 把这句话删掉跑性能分析就会出现段错误；
+
                 for(int i = 0; i < Event_Reault.size(); ++i){
                     auto & item = Event_Reault[i];
                     int id = item.Return_fd();

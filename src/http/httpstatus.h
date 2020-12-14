@@ -118,7 +118,25 @@ namespace ws{
         int V_major = 0;
         int V_minor = 0;
 
+        
         HttpFlag Set_Ka = Keep_Alive;
+
+        void init() noexcept {    // 用于在每次解析的时候重新初始化状态而不是重新设置上指针
+            method = HRInit;
+            Status = HPSOK;
+            Fault = HPFOK;
+
+            Uri = nullptr; //请求方式
+            Header = nullptr;
+            Value = nullptr;
+
+            Uri_length = 1;
+            Header_length = 1;
+            Value_length = 1;
+            Content_length = 0;
+            V_major = 0;
+            V_minor = 0;
+        }
     };
 
     std::ostream& operator<<(std::ostream& os, const HttpParser_Content& para);

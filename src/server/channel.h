@@ -69,7 +69,7 @@ private:
     int RoundRobin = 0;         // TODO 可以根据每个线程的实际吞吐量去做一个负载均衡，不过这样需要一个线程安全的数据结构去做负载均衡；
     static const uint64_t tool; // no constexper.//https://www.ojit.com/article/112265
     const int ThreadNumber = std::thread::hardware_concurrency();   // 考虑到后面可能会调整RealThreadNumber大于逻辑核数，为了满足SetCPUaffinity的参数约束；
-    const unsigned int RealThreadNumber = std::max<int>(1, ThreadNumber - 1);    // TODO 需要再看看一般的数据量到底是计算密集型还是IO密集型；
+    const unsigned int RealThreadNumber = std::max<int>(1, ThreadNumber - 1);    // FIX：根据测试一般请求是计算密集型；
 public:
     channel_helper() = default;
 

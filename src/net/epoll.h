@@ -56,7 +56,7 @@ namespace ws{
                 return epoll_ctl(epoll_fd_, EPOLL_CTL_DEL, para.Return_fd(), para.Return_Pointer());
             }
             int Remove(EpollEvent&& para){
-                std::cout << "已断开一个连接 : " << epoll_fd_ << std::endl;
+                //std::cout << "已断开一个连接 : " << epoll_fd_ << std::endl;
                 return epoll_ctl(epoll_fd_, EPOLL_CTL_DEL, para.Return_fd(), para.Return_Pointer());
             }
             int Remove(const Havefd& Hf, EpollEventType ETT){
@@ -71,6 +71,7 @@ namespace ws{
                 int Available_Event_Number_ =
                     epoll_wait(epoll_fd_,reinterpret_cast<epoll_event*>(ETT.array.get()), ETT.All_length,timeout);
                 ETT.Available_length = Available_Event_Number_;
+                // 可能返回-1，但是没关系，在ws.cc中处理就可以了；
             }
 
             int fd() const & noexcept override {return epoll_fd_; }

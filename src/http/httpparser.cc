@@ -23,8 +23,9 @@ namespace ws{
         // 这里不应该清空User_Buffer_，因为可能上一次收包只收了一部分；FIX！
         // TODO 且这里不需要重新生成指针，只需要初始化一下Parser_Result就可以了
         //User_Buffer_->Clean();
-        Parser_Result.release();
-        Parser_Result = std::make_unique<HttpParser_Content>();
+        Parser_Result->init();
+/*         Parser_Result.release();
+        Parser_Result = std::make_unique<HttpParser_Content>(); */
     }
 
     bool HttpParser::SetRequesting(){ 
