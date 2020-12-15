@@ -22,6 +22,12 @@
 #include <sys/epoll.h>
 
 #include <initializer_list>
+
+#ifndef __GNUC__
+
+#define  __attribute__(x)  /*NOTHING*/
+    
+#endif
   
 namespace ws{ 
     enum EpollEventType{
@@ -53,7 +59,7 @@ namespace ws{
             EpollEvent(const Havefd& Hf, EpollEventType EET) : 
                 event_(epoll_event{EET, {.fd = Hf.fd()}}){} //这样可以被Havefd的派生类构造 其中包含fd 可行
 
-            bool check(EpollEventType EET) const noexcept {return event_.events & EET;}
+            bool __attribute__((hot)) __attribute__((pure)) check(EpollEventType EET) const noexcept {return event_.events & EET;}
             bool check(std::initializer_list<EpollEventType> EET) const noexcept {
                 for(auto T : EET){
                     if(!(event_.events & T)) return false;
@@ -62,7 +68,7 @@ namespace ws{
             }
             
             epoll_event* Return_Pointer() noexcept {return &event_;}
-            int Return_fd() const noexcept {return event_.data.fd;}
+            int __attribute__((hot)) Return_fd() const & noexcept {return event_.data.fd;}
             uint32_t Return_EET() const noexcept {return event_.events;}
         private:
             epoll_event event_;

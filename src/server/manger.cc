@@ -20,6 +20,12 @@
 
 #include <sys/socket.h>
 
+#ifndef __GNUC__
+
+#define  __attribute__(x)  /*NOTHING*/
+    
+#endif
+
 namespace ws{
     int Manger::Opera_Member(std::unique_ptr<Member>& ptr, EpollEventType& EE){
         int id = ptr->fd();         //RTTI
@@ -49,7 +55,7 @@ namespace ws{
         return id;      
     }
 
-    int Manger::Remove(int fd){
+    int __attribute__((hot))  Manger::Remove(int fd){
         if(!Exist(fd)){
             throw std::invalid_argument("'Manger::Remove' Don't have this fd.");
         }
@@ -57,7 +63,7 @@ namespace ws{
         return Fd_To_Member.erase(fd);
     }
 
-    int Manger::Update(int fd){
+    int __attribute__((hot)) Manger::Update(int fd){
         if(!Exist(fd)){
             throw std::invalid_argument("'Manger::Update' Don't have this fd.");
         }
@@ -74,7 +80,7 @@ namespace ws{
     /**
      * @notes: 可写事件进入这里的时候如果写完会从后两个判断出去，取决于连接状态，因为确定包是收全的；
     */
-    int Manger::JudgeToClose(int fd){   // 函数没有返回值
+    int __attribute__((hot)) Manger::JudgeToClose(int fd){   // 函数没有返回值
         if(!Exist(fd)){
             throw std::invalid_argument("'Manger::JudgeToClose' Don't have this fd.");
         }
@@ -93,7 +99,7 @@ namespace ws{
         return 0;   // 设计失误
     }
  
-    void Manger::Reading(int fd, long _time_){
+    void __attribute__((hot)) Manger::Reading(int fd, long _time_){ 
         if(!Exist(fd)){
             throw std::invalid_argument("'Manger::Reading' Don't have this fd.");
         }

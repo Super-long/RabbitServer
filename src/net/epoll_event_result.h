@@ -21,14 +21,20 @@
 
 #include <memory>
 
+#ifndef __GNUC__
+
+#define  __attribute__(x)  /*NOTHING*/
+
+#endif
+
 namespace ws{
     class EpollEvent_Result final : public Nocopy{
         friend class Epoll; // 在epoll_wait中修改Available_length；
         public:
             explicit EpollEvent_Result(int len) : 
-            array(new EpollEvent[len]),Available_length(0), All_length(len){}
+                array(new EpollEvent[len]),Available_length(0), All_length(len){}
 
-            size_t size() const & noexcept {return Available_length; }
+            size_t __attribute__((hot)) size() const & noexcept {return Available_length; }
 
             EpollEvent& at(size_t i){
                 if(i > Available_length){
@@ -38,13 +44,13 @@ namespace ws{
                 }
             }
 
-            const EpollEvent& operator[](size_t i) const{
+            const EpollEvent& __attribute__((hot)) operator[](size_t i) const {
                 // 其实一般的下标运算符不应该抛出错误
                 if(i > Available_length) throw std::out_of_range("'EpollEvent_Result : []' Out of Bounds.");
                 return array[i];
             }
             
-            EpollEvent& operator[](size_t i){
+            EpollEvent& __attribute__((hot)) operator[](size_t i){
                 return const_cast<EpollEvent&>(
                     static_cast<const EpollEvent_Result&>(*this)[i]
                 );

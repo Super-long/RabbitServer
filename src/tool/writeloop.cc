@@ -18,6 +18,12 @@
 #include <cstdarg>
 #include <sys/socket.h>
 
+#ifndef __GNUC__
+
+#define  __attribute__(x)  /*NOTHING*/
+    
+#endif
+
 /*
                                    .. .vr       
                                  qBMBBBMBMY     
@@ -50,7 +56,8 @@
 */
 
 namespace ws{
-    int WriteLoop::swrite(const char* format, ...){
+    // 每次构造响应报文的时候有大量的调用，见provider.cc
+    int __attribute__((hot)) WriteLoop::swrite(const char* format, ...){
         va_list va;
         va_start(va, format);
         int ret = User_Buffer_->SWrite(format, va);
@@ -62,7 +69,7 @@ namespace ws{
     /**
      * @param: length为要发送数据的长度
     */
-    WriteLoop::COMPLETETYPE WriteLoop::Send(int length){
+    WriteLoop::COMPLETETYPE __attribute__((hot)) WriteLoop::Send(int length){
         if(length < 1) throw std::invalid_argument("'WriteLoop::Send' error parameter.");
         int sent_ = 0;
 
@@ -90,7 +97,7 @@ namespace ws{
         return COMPLETE;
     }
 
-    WriteLoop::COMPLETETYPE WriteLoop::SendFile(std::shared_ptr<FileReader> ptr){
+    WriteLoop::COMPLETETYPE __attribute__((hot)) WriteLoop::SendFile(std::shared_ptr<FileReader> ptr){
         ssize_t len = 0;
         while(len = ptr->SendFile(fd_) && len > 0){}
         if(!ptr->Send_End()){

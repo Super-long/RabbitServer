@@ -33,7 +33,7 @@ int main(int argc, char **argv){
  * 执行性能测试步骤：
  * step0: 执行./Web_Server开启服务器
  * step1：开启一个终端，执行 kill -s SIGUSR1 $PID，PID为RabbitServer的服务进程，此时开始性能分析
- * step2：对RabbitServer执行压力测试，比如ab，执行 ab -n 10000 -c 100  127.0.0.1:8888/
+ * step2：对RabbitServer执行压力测试，比如ab，执行 ab -n 100000 -c 100  127.0.0.1:8888/
  * step3：执行kill -s SIGUSR1 $PID，结束性能分析
  * step4：此时已经生成了test.prof, 执行 pprof ./Web_Server test.prof --pdf > test.pdf
  * */

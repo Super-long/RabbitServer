@@ -17,6 +17,7 @@
 #include <string>
 #include "../../base/nocopy.h"
 
+// 你想搞懂递归吗？
 // 对这个文件有什么疑问请看最下面的注释
 
 namespace ws{

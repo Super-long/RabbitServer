@@ -24,6 +24,12 @@
 
 #include <memory>
 
+#ifndef __GNUC__
+
+#define  __attribute__(x)  /*NOTHING*/
+
+#endif
+
 namespace ws{ 
 
     class HttpParser : public Nocopy{
@@ -31,13 +37,13 @@ namespace ws{
             HttpParser(std::shared_ptr<UserBuffer> ptr, std::shared_ptr<HttpRequest> request, Extrabuf& extra):
                 User_Buffer_(std::move(ptr)),Parser_Result(std::make_unique<HttpParser_Content>()),Request_Result(request),Extrabuffer_(extra){}
 
-            void Again_Parser(); 
-            HttpParserFault Starting_Parser();
-            bool Finished() const {
+            void __attribute__((hot)) Again_Parser(); 
+            HttpParserFault __attribute__((hot)) Starting_Parser();
+            bool __attribute__((hot)) Finished() const {
                 // Faulth初始值是HPFOK
                 return Parser_Result->Fault == HPFContent;
                 //return Parser_Result->Fault != HPFOK;
-                }
+            }
             
             bool SetRequesting();
 
@@ -47,7 +53,7 @@ namespace ws{
             std::shared_ptr<HttpRequest> Request_Result; 
             Extrabuf& Extrabuffer_;
             bool Parsering();
-            bool Parser_able(){return User_Buffer_->Readable() >= 16;}  // 请求行+空行，最小的HTTP方法为三字节
+            bool Parser_able() __attribute__((pure)) {return User_Buffer_->Readable() >= 16;}  // 请求行+空行，最小的HTTP方法为三字节
     };
 
 }

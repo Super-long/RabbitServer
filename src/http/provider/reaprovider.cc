@@ -91,10 +91,6 @@ namespace ws{
         memcpy(release_ptr2, y.ReadPtr(), y.Readable());
         release_ptr2[y.Readable()] = '\0';
 
-/*         file = std::make_shared<FileReader>   
-        (static_cast<FileProxy>(_Request_->Get_Value(static_cast<ParsedHeader>("Host")).ReadPtr())
-        , _Request_->Return_Uri().ReadPtr());  */
-
         //std::cout << "str " << str << std::endl;
         //std::cout << "release1 : " << release_ptr2 << std::endl;
 
@@ -103,8 +99,8 @@ namespace ws{
         // 这里我们需要特判下默认的情况，即url为'/'
         //std::cout << y.Readable() << " " << release_ptr2[0] << std::endl;
         if(y.Readable() == 1 && release_ptr2[0] == '/'){    // 默认情况打开index.html
-            // TODO 改为相对路径
-            file = std::make_shared<FileReader>("/home/lizhaolong/Desktop/Exercise/RabbitServer/src/index.html");
+            // TODO 这里需要搞成环境变量才可以设置不基于可执行文件的相对路径，麻烦，要么强迫用户以特定的方式执行，要么强迫用户添加环境变量，还是前者省事；
+            file = std::make_shared<FileReader>("../src/index.html");
         } else {
             file = std::make_shared<FileReader>   
             ( static_cast<FileProxy>(str.c_str())   // 构造函数中已经open了

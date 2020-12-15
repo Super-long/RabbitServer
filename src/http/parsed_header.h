@@ -35,7 +35,7 @@ namespace ws{
             ParsedHeader() = default;
             size_t Readable() const override {return length;}
             const char* ReadPtr() const override{return Header;}
-            void Read(char* Start, int bytes){
+            void __attribute__ ((access (write_only, 1))) Read(char* Start, int bytes){
                 memcpy(Start, Header, static_cast<size_t>(bytes));
             }
             
@@ -43,16 +43,15 @@ namespace ws{
                 //This is a design error. 
                 return nullptr;
             }
-            size_t Writeable() const{
+            size_t Writeable() const {
                 return length;
             }
-            virtual char* WritePtr(){
+            virtual __attribute__((returns_nonnull)) char* WritePtr(){
                 return const_cast<char*>(Header);
             }
 
-
             size_t Length() const {return length;}
-            char Peek(int jump) const{
+            char Peek(int jump) const {
                 if(jump > length) throw std::out_of_range("'ParsedHeader Peek' Out of max length.");
                 return Header[jump];
             }
@@ -65,7 +64,7 @@ namespace ws{
             ~ParsedHeader(){}
 
         private:
-            const char* Header;//获取到的指针本来就是智能指针 
+            const char* Header;//获取到的指针本来就是智能指针
             size_t length;
     };
 

@@ -42,15 +42,14 @@ namespace ws{
             signal(SIGPIPE, SIG_IGN);
 
             // 其实这两个玩意对于性能没有啥帮助；《[读入，输出优化](https://oi-wiki.org/contest/io/)》
-            std::ios::sync_with_stdio(false);
-            std::cin.tie(nullptr);
+/*             std::ios::sync_with_stdio(false);
+            std::cin.tie(nullptr); */
 
             _Server_.Set_AddrRUseA();
             _Server_.Base_Setting();
             _Server_.Server_BindAndListen();
             _Epoll_.Add(_Server_, EpollCanRead());
             EpollEvent_Result Event_Reault(Y_Dragon::EventResult_Number());
-
             channel_helper Channel_;
             Channel_.loop();
 
@@ -64,7 +63,6 @@ namespace ws{
                 for(int i = 0; i < Event_Reault.size(); ++i){
                     auto & item = Event_Reault[i];
                     int id = item.Return_fd();
-
                     if(id == _Server_.fd()){ //这里放入事件循环
                         _Server_.Server_Accept([&](int fd){Channel_.Distribution(fd);});
                         _Epoll_.Modify(_Server_, EpollCanRead());

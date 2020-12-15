@@ -22,6 +22,12 @@
 #include <string>
 #include <stdexcept>
 #include <cstddef>
+
+#ifndef __GNUC__
+
+#define  __attribute__(x)  /*NOTHING*/
+    
+#endif
  
 namespace ws{
     class UserBuffer : public Nocopy,public BaseBuffer{
@@ -34,12 +40,16 @@ namespace ws{
             size_t Writeable() const noexcept final{return Buffer_Size - Write_Spot;}
             
             const char* ReadPtr() const final{return Buffer_.get() + Read_Spot;}
-            char* WritePtr() final{return Buffer_.get() + Write_Spot;}
+
+            // 如果get获取的指针为空，在创建的时候就可以检测到，所以是满足returns_nonnull的
+            char* __attribute__((hot)) __attribute__((returns_nonnull)) WritePtr() final {
+                return Buffer_.get() + Write_Spot;
+            } 
             /*In most cases it is dangerous to operate the pointer directly.*/
 
             std::unique_ptr<char[]> Read(int Bytes) final;
             void Read(char* Start, int bytes) final;
-            void read(int bytes) {
+            void __attribute__((hot)) read(int bytes){
                 if(bytes < 0) throw std::invalid_argument("'userbuffer::read' error paramater.");
                 Read_Spot += bytes;
             }
