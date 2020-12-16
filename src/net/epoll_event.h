@@ -50,6 +50,7 @@ namespace ws{
     constexpr EpollEventType EpollCanRead() {return static_cast<EpollEventType>(EpollTypeBase() | EETCOULDREAD); }
     constexpr EpollEventType EpollCanWite() {return static_cast<EpollEventType>(EpollTypeBase() | EETCOULDWRITE); }
     constexpr EpollEventType EpollRW() {return static_cast<EpollEventType>(EpollTypeBase() | EETCOULDWRITE | EETCOULDREAD); }
+    constexpr EpollEventType EpollOnlyRead(){return static_cast<EpollEventType>(EETCOULDREAD);}
     
     class EpollEvent final : public Copyable{
         public:

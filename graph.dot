@@ -1,5 +1,5 @@
 digraph config{
-    WS -> {channel_helper, Server}  // Manger,Epoll,Server这三个确实有，但是加上影响图的绘制；
+    WS -> {channel_helper, Server, Timer, LoadBalance}  // Manger,Epoll,Server这三个确实有，但是加上影响图的绘制；
     channel_helper -> {channel, channel, channel}
     channel -> {Manger,Epoll}
     Epoll -> {EpollEvent_Result}

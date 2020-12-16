@@ -18,6 +18,7 @@ aux_source_directory(src/net  WS_NET)
 aux_source_directory(src/http WS_HTTP)
 aux_source_directory(src/tool WS_TOOL)
 aux_source_directory(src/log WS_LOG)
+aux_source_directory(tool/ThreadSafeQueue WS_QUEUE)
 #搜索目录下所有的cpp文件
 
 add_executable(Web_Server
@@ -30,4 +31,5 @@ add_executable(Web_Server
         ${WS_TOOL}
         ${WS_FASTCGI}
         ${WS_LOG}
+        ${WS_QUEUE}
 )

@@ -105,7 +105,7 @@ namespace ws{
             int BufferSize = 4048;                                  // 额外buffer大小
     };
 
-    class Socket : public Havefd,Copyable{
+    class Socket : public Havefd, public Copyable{
         public:
             Socket() : Socket_fd_(socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, 0)){
                 //SetNoblockingCLOEXEC();

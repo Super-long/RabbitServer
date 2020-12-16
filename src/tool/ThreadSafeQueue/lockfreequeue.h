@@ -8,6 +8,7 @@
 #define LOCKFREEQUEUE_H_
 
 // https://github.com/RickyZhaoRuiQi/lock_free_que
+// 有一说一，不是的自己代码跑起来都不放心；
 
 namespace ws{
 

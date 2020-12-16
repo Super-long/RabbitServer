@@ -20,6 +20,7 @@
 #include "../net/epoll.h"
 #include "manger.h"
 #include "channel.h"
+#include "../tool/timer.h"
 
 namespace ws{
     class Web_Server{ 
@@ -29,7 +30,8 @@ namespace ws{
         private: 
             Manger _Manger_;
             Epoll _Epoll_; 
-            Server _Server_; 
+            Server _Server_;
+            Timer _Timer_;
     };
 }
 
