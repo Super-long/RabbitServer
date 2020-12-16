@@ -43,6 +43,7 @@ namespace ws{
                 //This is a design error. 
                 return nullptr;
             }
+            
             size_t Writeable() const {
                 return length;
             }

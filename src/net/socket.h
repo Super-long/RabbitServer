@@ -28,6 +28,13 @@
 #include <string.h> 
 #include <unistd.h>
 #include <fcntl.h>
+#include <iostream>
+
+#ifndef __GNUC__
+
+#define  __attribute__(x)  /*NOTHING*/
+    
+#endif
 
 namespace ws{
 
@@ -35,17 +42,24 @@ namespace ws{
         enum isvaild {INVAILD = -1, VAILD};
         public:
             void init(){
+                // 延迟绑定，因为大多数连接用不上
                 extrabuf = std::make_unique<char[]>(4048);
                 ExtrabufPeek = static_cast<int>(VAILD);
-                highWaterMarkCallback_ = []{};  // 默认的高水位回调为空 
+                highWaterMarkCallback_ = []{
+                    std::cerr << "ERROR : ExtrabufPeek exceeds 64MB.(socket.h).\n";
+                };  // 默认的高水位回调
             }
 
-            // 返回buffer的起始地址
-            char* Get_ptr() const noexcept {
+            void __attribute__((hot)) clear() noexcept {
+                ExtrabufPeek = INVAILD;
+            }
+
+            // 返回buffer的起始地址，有效的调用一定是非空的；
+            char* __attribute__((returns_nonnull)) Get_ptr() const noexcept {
                 return extrabuf.get() + ExtrabufPeek;
             }
 
-            int Get_length() const & noexcept{
+            int __attribute__((pure)) Get_length() const & noexcept {
                 return ExtrabufPeek;
             }
 
@@ -53,11 +67,11 @@ namespace ws{
                 ExtrabufPeek += spot;
             }
 
-            int WriteAble() const & noexcept{
+            int __attribute__((pure)) WriteAble() const & noexcept {
                 return BufferSize - ExtrabufPeek;
             }
 
-            bool IsVaild() const & noexcept{
+            bool __attribute__((pure)) IsVaild() const & noexcept {
                 return ExtrabufPeek == INVAILD ? false : true;
                 // return static_cast<bool>(ExtrabufPeek);
             }
@@ -72,15 +86,15 @@ namespace ws{
                 return true;
             }
 
-            void SetHighWaterMarkCallback_(std::function<void()> fun){
+            void SetHighWaterMarkCallback_(std::function<void()> fun) noexcept {
                 highWaterMarkCallback_ = std::move(fun);
             }
 
-            bool IsExecutehighWaterMark() const noexcept{
+            bool __attribute__((pure)) IsExecutehighWaterMark() const noexcept {
                 return Get_length() >= highWaterMark_;
             }
 
-            void Callback(){
+            void Callback(){    // 不设置noexcept的原因是后面可能会在高水位回调引入异常，函数由用户指定，我们不做任何假设；
                 if(highWaterMarkCallback_) highWaterMarkCallback_();
             }
         private:
@@ -125,7 +139,12 @@ namespace ws{
             int Write(char* Buffer, int length, int flag = 0);
             //int Read(...)
             bool IsExtraBuffer() const {return ExtraBuffer_.IsVaild();}
-            Extrabuf& ReturnExtraBuffer() {return ExtraBuffer_;}
+            Extrabuf* ReturnExtraBuffer() {return &ExtraBuffer_;}
+
+            void clear(){
+                ExtraBuffer_.clear();
+                Have_Close_ = true;
+            }
 
         private:
             Extrabuf ExtraBuffer_;

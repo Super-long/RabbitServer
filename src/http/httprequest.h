@@ -34,9 +34,9 @@ namespace ws{
     class HttpRequest : public Nocopy{
         public:
             HttpRequest(){
-                Header_Value.reserve(10);
+                Header_Value.reserve(10);   // magic number
             };
-            //
+
             void Set_VMajor(int ma){ Version_Major = ma;} 
             void Set_VMinor(int mi){ Version_Minor = mi;}
             void Set_CStart(const char* ptr){ Content_Start = ptr;}
@@ -52,7 +52,7 @@ namespace ws{
             void Set_Request_Buffer(std::shared_ptr<UserBuffer> ub){Request_Buffer_ = std::move(ub);}
             //The above is the assignment of the base data.
 
-            //
+
             int Return_Version_Ma() const & noexcept {return Version_Major;}
             int Return_Version_Mi() const & noexcept {return Version_Minor;}
             const char* Return_Content_Start() const & noexcept {return Content_Start;}
@@ -72,10 +72,17 @@ namespace ws{
 
             bool __attribute__((pure)) Request_good() const noexcept{
                 return Fault_ == HPFContent;}
+            
+            void clear(){
+                Request_Buffer_->Clean();
+                Header_Value.clear();
+                Header_Value.reserve(10);
+            }
 
         private:
             int Version_Major;
             int Version_Minor;
+
             const char* Content_Start;
             size_t Content_Length;
 

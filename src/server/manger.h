@@ -34,7 +34,7 @@ namespace ws{
             _Epoll_(_epoll), Timer_Wheel_(std::make_unique<TimerWheel>()){}
 
             int Opera_Member(std::unique_ptr<Member>&, EpollEventType&);
-            int Opera_Member(std::unique_ptr<Member>&&, EpollEventType&&);
+            int Opera_Member(int, EpollEventType&&);
             int Opera_Member(std::unique_ptr<Member>&, EpollEventType&&);
             int Opera_Member(std::unique_ptr<Member>&&, EpollEventType&);
             
@@ -53,7 +53,7 @@ namespace ws{
         private:
             std::unique_ptr<TimerWheel> Timer_Wheel_;
             Epoll& _Epoll_;
-            std::unordered_map<int, std::unique_ptr<Member>> Fd_To_Member;
+            std::unordered_map<int, std::unique_ptr<Member>> Fd_To_Member;  // 相当于slab
     };
 }
 

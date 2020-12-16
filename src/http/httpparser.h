@@ -34,8 +34,8 @@ namespace ws{
 
     class HttpParser : public Nocopy{
         public: 
-            HttpParser(std::shared_ptr<UserBuffer> ptr, std::shared_ptr<HttpRequest> request, Extrabuf& extra):
-                User_Buffer_(std::move(ptr)),Parser_Result(std::make_unique<HttpParser_Content>()),Request_Result(request),Extrabuffer_(extra){}
+            HttpParser(std::shared_ptr<UserBuffer> ptr, std::shared_ptr<HttpRequest> request, Extrabuf* extra):
+                User_Buffer_(std::move(ptr)),Parser_Result(std::make_unique<HttpParser_Content>()), Request_Result(request), Extrabuffer_(extra){}
 
             void __attribute__((hot)) Again_Parser(); 
             HttpParserFault __attribute__((hot)) Starting_Parser();
@@ -47,11 +47,19 @@ namespace ws{
             
             bool SetRequesting();
 
+            // 名字起的奇形怪状是因为clear是最后加上的，前面相同功能的函数是做其他事情的；
+            void clear(){
+                User_Buffer_->Clean();
+                Parser_Result->init();
+                Request_Result->clear();
+                // Extrabuffer_在socket clear的时候已经初始化了
+            }
+
         private: 
             std::shared_ptr<UserBuffer> User_Buffer_;
             std::unique_ptr<HttpParser_Content> Parser_Result;
             std::shared_ptr<HttpRequest> Request_Result; 
-            Extrabuf& Extrabuffer_;
+            Extrabuf* Extrabuffer_;
             bool Parsering();
             bool Parser_able() __attribute__((pure)) {return User_Buffer_->Readable() >= 16;}  // 请求行+空行，最小的HTTP方法为三字节
     };

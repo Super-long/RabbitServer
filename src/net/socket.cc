@@ -21,6 +21,7 @@
 #include <iostream>
 
 namespace ws{
+    // 提供给上层单次关闭的功能
     int Socket::Close(){
         int rv = ::close(Socket_fd_);
         if(rv != -1) Have_Close_ = false;
@@ -46,6 +47,7 @@ namespace ws{
         //char* strart = ptr->WritePtr();   // For Debugging.
 
         char* StartBuffer = ptr->WritePtr();
+        errno = 0;
         while(true){
             ret = recv(Socket_fd_, StartBuffer, static_cast<size_t>(length), flag);
 /*             std::cout << "errno : " << errno << std::endl;
@@ -53,13 +55,13 @@ namespace ws{
             // ret = read(Socket_fd_,ptr->WritePtr(),static_cast<size_t>(length)); 
 
             // 显然每次length大于等于ret
-            if(ret != -1 && !ExtraBuffer_.IsVaild()){ 
+            if(ret != -1 && !ExtraBuffer_.IsVaild()){
                 sum += ret;
-                length -= ret;  // 目前缓冲区中有效的buffer长度
+                length -= ret;              // 目前缓冲区中有效的buffer长度
                 ptr->Write(ret);
                 StartBuffer = ptr->WritePtr();
 
-                if(!ptr->Writeable()){ //Buffer is full.
+                if(!ptr->Writeable()){      //Buffer is full.
                     ExtraBuffer_.init();    // 初始化额外的缓冲区
                     StartBuffer = ExtraBuffer_.Get_ptr();
                     length = ExtraBuffer_.WriteAble();
@@ -87,14 +89,14 @@ namespace ws{
                     continue;
                 else {
                     // 走到这里就是各种各样奇怪的错误了，没必要在做细化的区分，直接退出就OK；
-                    std::cerr << "ERROR : Socket::Read.\n";
+                    std::cerr << "ERROR : Socket::Read --> (errno == " << errno << " )\n";
                     break;
                 }
             }
         }
-        //std::string str(strart, ptr->Readable());
-/*         std::cout << "内容 : \n" << str << std::endl;
-        std::cout << "readable : " << ptr->Readable() << std::endl;*/
+/*         std::string str(strart, ptr->Readable());
+        std::cout << "内容 : \n" << str << std::endl;
+        std::cout << "readable : " << ptr->Readable() << std::endl; */
         //std::cout << "一次recv的完成 socket.cc : " << sum << std::endl;
         return static_cast<int>(sum);
     }

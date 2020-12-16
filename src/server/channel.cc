@@ -65,7 +65,7 @@ void looping(std::promise<std::queue<int>*>& pro, int eventfd, int index){
                         while(Temp--){
                             assert(!rea.return_ptr()->empty());
                             // 从队列中取到的值就是fd，第二个参数是这个fd加入epoll应该触发的事件是什么，默认注册三个事件，加上读事件；
-                            rea._Manger_.Opera_Member(std::make_unique<Member>(rea.return_ptr()->front()), EpollCanRead());
+                            rea._Manger_.Opera_Member(rea.return_ptr()->front(), EpollCanRead());
                             rea.return_ptr()->pop();
                         }
                         rea._Epoll_.Modify(rea, EpollCanRead());
@@ -73,7 +73,7 @@ void looping(std::promise<std::queue<int>*>& pro, int eventfd, int index){
                         rea._Manger_.Remove(id);
                     } else if (item.check(EETCOULDREAD)){
                         rea._Manger_.Reading(id);
-                        rea._Manger_.JudgeToClose(id); //修改
+                        rea._Manger_.JudgeToClose(id);  // 服务端可能出现大量TIME_WAIT状态的套接字导致资源耗尽
                     } else if (item.check(EETCOULDWRITE)){
                         rea._Manger_.Writing(id);
                         rea._Manger_.JudgeToClose(id);

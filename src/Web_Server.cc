@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include <sys/types.h>
 
+#undef __GNUC__
+
 // 用于服务端程序执行性能测试
 void setGperfStatus(int signum) {
     static bool is_open = false;

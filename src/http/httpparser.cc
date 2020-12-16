@@ -235,14 +235,14 @@ namespace ws{
 
             User_Buffer_->read(1);
             // 当User_Buffer_缓冲区解析完毕且Extrabuffer_中还有数据时执行拷贝；
-            if(User_Buffer_->Readable() == 0 && Extrabuffer_.IsVaild()){ //take out data from extrabuffer.
+            if(User_Buffer_->Readable() == 0 && Extrabuffer_->IsVaild()){ //take out data from extrabuffer.
                 User_Buffer_->Clean();
-                auto length = Extrabuffer_.Get_length();
+                auto length = Extrabuffer_->Get_length();
                 if(length > User_Buffer_->Length()){
                     length = User_Buffer_->Length();
                 }
-                Extrabuffer_.Write(length);
-                User_Buffer_->Write(Extrabuffer_.Get_ptr(), length);
+                Extrabuffer_->Write(length);
+                User_Buffer_->Write(Extrabuffer_->Get_ptr(), length);
             }
         }
 

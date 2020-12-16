@@ -50,7 +50,6 @@ namespace ws{
                 // 成功以后才会分发套接字；失败直接退出就可以了；
                 f(ret);
                 break;
-                // std::cout << "已接收一个新的连接 fd : " << ret << std::endl;
             } else if (ret == -1 && errno == EMFILE){
                 // 我的架构中只有一个线程accept，所以此做法可以保证安全；
                 fileopen_helper prevent(FileOpen);
@@ -67,7 +66,6 @@ namespace ws{
                 std::cerr << "ERROR : Server::Server_Accept, unexpected situation.\n";
             }
         }
-        
 
 /*         for(int _fd; (_fd = accept4(fd(), nullptr, nullptr, SOCK_NONBLOCK)) != -1; ){
             f(_fd);

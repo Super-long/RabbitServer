@@ -34,11 +34,18 @@ namespace ws{
         return id;      
     }
 
-    int Manger::Opera_Member(std::unique_ptr<Member>&& ptr, EpollEventType&& EE){
-        int id = ptr->fd();
-        Fd_To_Member.emplace(id, std::move(ptr.release()));
-        _Epoll_.Add(*Fd_To_Member[id],std::move(EE));
-        return id;
+    /**
+     * @notes: 这里的新逻辑应该是不存在就插入，存在就UpdateMemberStruct;
+    */
+    int Manger::Opera_Member(int fd, EpollEventType&& EE){
+        if(!Exist(fd)){
+            Fd_To_Member.emplace(fd, new Member(fd));
+        } else {
+            Fd_To_Member[fd]->clear();
+        }
+
+        _Epoll_.Add(*Fd_To_Member[fd],std::move(EE));
+        return fd;
     }
 
     int Manger::Opera_Member(std::unique_ptr<Member>&& ptr, EpollEventType& EE){
@@ -55,12 +62,13 @@ namespace ws{
         return id;      
     }
 
-    int __attribute__((hot))  Manger::Remove(int fd){
+    int __attribute__((hot)) Manger::Remove(int fd){
         if(!Exist(fd)){
             throw std::invalid_argument("'Manger::Remove' Don't have this fd.");
         }
         _Epoll_.Remove(*Fd_To_Member[fd],EpollTypeBase());
-        return Fd_To_Member.erase(fd);
+        return Fd_To_Member[fd]->InitiativeClose();;
+        //return Fd_To_Member.erase(fd);
     }
 
     int __attribute__((hot)) Manger::Update(int fd){
@@ -92,14 +100,17 @@ namespace ws{
         } else if (OneMember->CloseAble()){
             _Epoll_.Remove(static_cast<EpollEvent>(fd));
             auto temp = Fd_To_Member.find(fd);
-            Fd_To_Member.erase(fd);
+            
+            // erase成为了性能瓶颈，占到了全部CPU的百分之十左右
+            //Fd_To_Member.erase(fd);
+            Fd_To_Member[fd]->InitiativeClose();    // 关闭套接字
         } else {    // 解析失败，包没收全；或者包收全，状态为keep-alive
             Update(fd);
         }
         return 0;   // 设计失误
     }
  
-    void __attribute__((hot)) Manger::Reading(int fd, long _time_){ 
+    void __attribute__((hot)) Manger::Reading(int fd, long _time_){
         if(!Exist(fd)){
             throw std::invalid_argument("'Manger::Reading' Don't have this fd.");
         }

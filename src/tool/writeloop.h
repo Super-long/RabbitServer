@@ -34,7 +34,7 @@ namespace ws{
             enum COMPLETETYPE {IMCOMPLETE, COMPLETE, EMPTY};
             using Task = std::function<WriteLoop::COMPLETETYPE()>;
 
-            explicit WriteLoop(int fd, int length = 4096) : fd_(fd),User_Buffer_(std::make_unique<UserBuffer>(length)){} 
+            explicit WriteLoop(int fd, int length = 4096) : fd_(fd), User_Buffer_(std::make_unique<UserBuffer>(length)){} 
             int fd() const & override{return fd_;}
 
             int write(int bytes) {return User_Buffer_->Write(bytes);}   // 仅增加长度
@@ -59,6 +59,12 @@ namespace ws{
             COMPLETETYPE DoAll();
 
             [[deprecated]] size_t TaskQueSize() const & noexcept {return Que.size();}  // For Debugging.
+
+            // 复用member对象套接字会变，但是fd不变
+            void clear(){
+                Que.clear();
+                User_Buffer_->Clean();
+            }
  
         private:
             std::unique_ptr<UserBuffer> User_Buffer_; 
