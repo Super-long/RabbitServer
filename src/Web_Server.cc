@@ -12,14 +12,14 @@ void setGperfStatus(int signum) {
     if (signum != SIGUSR1) {
         return ;
     }
-    if (!is_open) {  // start
+    if (!is_open) {     // start
         is_open = true;
         ProfilerStart("test.prof");
-        std::cout << "ProfilerStart success" << std::endl;
-    } else {  // stop
+        std::cout << "ProfilerStart success！" << std::endl;
+    } else {            // stop
         is_open = false;
         ProfilerStop();
-        std::cout << "ProfilrerStop success" << std::endl;
+        std::cout << "ProfilrerStop success！" << std::endl;
     }
 }
 
