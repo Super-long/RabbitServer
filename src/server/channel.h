@@ -28,6 +28,8 @@
 #include "../net/epoll.h"
 #include "../base/config.h"
 #include "../base/havefd.h"
+#include "../tool/loadbalance.h"
+#include "../tool/ThreadSafeQueue/lockfreequeue.h"
 #include "manger.h"
 
 /**
@@ -36,6 +38,8 @@
 */
 
 namespace ws{
+
+extern template class LockFreeQueue<ThreadLoadData>;
 
 // 其实就是每个工作线程的类
 class channel : public Nocopy, public Havefd{
@@ -55,7 +59,7 @@ public:
         return &ptr_que;
     }
 
-    friend void looping(std::promise<std::queue<int>*>& pro, int eventfd, int index);
+    friend void looping(std::promise<std::queue<int>*>& pro, int eventfd, int index, LockFreeQueue<ThreadLoadData>& que);
 
 };
 
@@ -66,16 +70,21 @@ private:
     std::vector<std::future<std::queue<int>*> > vec;
     std::vector<std::queue<int>*> store_;
     std::vector<int> eventfd_;
-    int RoundRobin = 0;         // TODO 可以根据每个线程的实际吞吐量去做一个负载均衡，不过这样需要一个线程安全的数据结构去做负载均衡；
+    LoadBalance& TrueLD;
+    int RoundRobinValue = 0;         // TODO 可以根据每个线程的实际吞吐量去做一个负载均衡，不过这样需要一个线程安全的数据结构去做负载均衡；
     static const uint64_t tool; // no constexper.//https://www.ojit.com/article/112265
     const int ThreadNumber = std::thread::hardware_concurrency();   // 考虑到后面可能会调整RealThreadNumber大于逻辑核数，为了满足SetCPUaffinity的参数约束；
     const unsigned int RealThreadNumber = std::max<int>(1, ThreadNumber - 1);    // FIX：根据测试一般请求是计算密集型；
 public:
-    channel_helper() = default;
+    explicit channel_helper(LoadBalance& LD) : TrueLD(LD){}
 
     void loop(); 
 
     void Distribution(int fd);
+
+    // 几种负载均衡的算法
+    int RoundRobin() & noexcept;
+    int WeightedRoundRobin() &;
 };
 
 }

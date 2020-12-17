@@ -28,7 +28,7 @@ namespace ws{
             int fd() const & noexcept override {return timeFd;}
 
             // 间隔时间与首次超时时间，单位为纳秒; 默认为200ms以后启动，100ms间隔触发一次；
-            int SetTimer(long intervalNanoseconds = 100000000l, long firstNanoseconds = 200000000l){
+            int SetTimer(long intervalNanoseconds = 1000000000l, long firstNanoseconds = 2000000000l){
                 struct itimerspec its;
 
                 constexpr long base = 1000000000;

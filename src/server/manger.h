@@ -27,6 +27,7 @@
 #include <memory>
 
 namespace ws{
+
     class Manger : public Copyable{
         using Fun = std::function<int(int)>; 
         public:
@@ -34,7 +35,7 @@ namespace ws{
             _Epoll_(_epoll), Timer_Wheel_(std::make_unique<TimerWheel>()){}
 
             int Opera_Member(std::unique_ptr<Member>&, EpollEventType&);
-            int Opera_Member(int, EpollEventType&&);
+            int Opera_Member(int, EpollEventType&&, std::function<void(int)> fun);
             int Opera_Member(std::unique_ptr<Member>&, EpollEventType&&);
             int Opera_Member(std::unique_ptr<Member>&&, EpollEventType&);
             

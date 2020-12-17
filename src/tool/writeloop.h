@@ -34,7 +34,8 @@ namespace ws{
             enum COMPLETETYPE {IMCOMPLETE, COMPLETE, EMPTY};
             using Task = std::function<WriteLoop::COMPLETETYPE()>;
 
-            explicit WriteLoop(int fd, int length = 4096) : fd_(fd), User_Buffer_(std::make_unique<UserBuffer>(length)){} 
+            WriteLoop(int fd, std::function<void(int)> fun ,int length = 4096)
+                : fd_(fd), WriteLoopCallback(fun), User_Buffer_(std::make_unique<UserBuffer>(length)){} 
             int fd() const & override{return fd_;}
 
             int write(int bytes) {return User_Buffer_->Write(bytes);}   // 仅增加长度
@@ -70,6 +71,10 @@ namespace ws{
             std::unique_ptr<UserBuffer> User_Buffer_; 
             std::deque<Task> Que; //支持长连接
             int fd_;
+            std::function<void(int)> WriteLoopCallback;
+            uint32_t throughout = 0;
+            uint32_t interval;  // 负载均衡发送间隔，即调用多少次Dofirst以后发送到全局队列中，主要为了减少队列长度，以3为间隔，因为一个http响应报文最少需要调用三次
+            static const uint32_t expectedInetrval = 3;
  
             COMPLETETYPE Send(int length);
             COMPLETETYPE SendFile(std::shared_ptr<FileReader>);

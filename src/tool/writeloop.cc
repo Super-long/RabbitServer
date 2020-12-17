@@ -79,6 +79,9 @@ namespace ws{
                 sent_ += ans;
         }
 
+        throughout += sent_;
+        ++interval;
+
         User_Buffer_->read(sent_);  // 一个http响应报文至少需要两次send，所以缓冲区需要记录长度；
         int Remaining = length - sent_; 
         bool faultError = false;
@@ -99,7 +102,10 @@ namespace ws{
 
     WriteLoop::COMPLETETYPE __attribute__((hot)) WriteLoop::SendFile(std::shared_ptr<FileReader> ptr){
         ssize_t len = 0;
-        while(len = ptr->SendFile(fd_) && len > 0){}
+        ++interval;
+        while(len = ptr->SendFile(fd_) && len > 0){
+            throughout += len;
+        }
         if(!ptr->Send_End()){
             InsertSendFile(ptr);
             return IMCOMPLETE;
@@ -119,9 +125,14 @@ namespace ws{
     /**
      * @notes: 可能返回IMCOMPLETE和EMPTY，即失败与成功，需要函数调用方判断；
     */
-    WriteLoop::COMPLETETYPE WriteLoop::DoAll(){ 
+    WriteLoop::COMPLETETYPE WriteLoop::DoAll(){
         while(1){
             auto CompleteType = DoFirst();
+            if(interval >= expectedInetrval){
+                WriteLoopCallback(throughout);
+                throughout = 0;
+                interval = 0;
+            }
             if(CompleteType == COMPLETE) continue;
             else return CompleteType;
         }

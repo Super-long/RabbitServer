@@ -27,6 +27,7 @@
 #endif
 
 namespace ws{
+
     int Manger::Opera_Member(std::unique_ptr<Member>& ptr, EpollEventType& EE){
         int id = ptr->fd();         //RTTI
         Fd_To_Member.emplace(id,ptr.release());
@@ -37,9 +38,9 @@ namespace ws{
     /**
      * @notes: 这里的新逻辑应该是不存在就插入，存在就UpdateMemberStruct;
     */
-    int Manger::Opera_Member(int fd, EpollEventType&& EE){
+    int Manger::Opera_Member(int fd, EpollEventType&& EE, std::function<void(int)> fun){
         if(!Exist(fd)){
-            Fd_To_Member.emplace(fd, new Member(fd));
+            Fd_To_Member.emplace(fd, new Member(fd, fun));
         } else {
             Fd_To_Member[fd]->clear();
         }

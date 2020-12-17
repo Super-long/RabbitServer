@@ -18,6 +18,8 @@ struct Node{
     Node() : son(0), father(0) {}
 
     Node(int x, int y) : son(x), father(y) {}
+
+    Node(const Node& item) : son(item.son), father(item.father){}
 };
 
 ws::BaseQueue<Node> que1;
@@ -69,8 +71,9 @@ void LockFreeQueueTest_Push(){
 void LockFreeQueueTest_Pop(){
     ssize_t count = 0;
     for (size_t i = 0; i < 100000; i++){
-        auto item = que3.pop();
-        if(item == Node()){
+        Node temp;
+        que3.pop(temp);
+        if(temp == Node()){
             count++;
         }
     }

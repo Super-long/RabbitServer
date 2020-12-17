@@ -15,6 +15,7 @@
 
 #include "../base/config.h"
 #include "../tool/ThreadSafeQueue/lockfreequeue.h"
+#include "../tool/loadbalance.h"
 #include "ws.h"
 
 #include <signal.h>
@@ -24,6 +25,8 @@
 #include <iostream>
 
 namespace ws{
+
+    extern template class LockFreeQueue<ThreadLoadData>;
 
     /*
      * @notes: gettimeofday的缺点是精度比较低，但是速度快，因为它不是一个系统调用，且微秒已经可以满足我们的需要,所以没有必要用cpp的接口去写这个；
@@ -53,11 +56,12 @@ namespace ws{
             _Epoll_.Add(_Timer_, EpollOnlyRead());  // 处理连接，又是单线程，只注册一个可读事件即可
             _Timer_.SetTimer();
 
-            EpollEvent_Result Event_Reault(Y_Dragon::EventResult_Number());
-            channel_helper Channel_;
-            Channel_.loop();
+            LockFreeQueue<ThreadLoadData> que;
+            LoadBalance LB(que);    // 负载均衡器
 
-            //ws::LockFreeQueue<Node> que;
+            EpollEvent_Result Event_Reault(Y_Dragon::EventResult_Number());
+            channel_helper Channel_(LB);
+            Channel_.loop();
 
             while(true){
                 //constexpr int Second = 20;
@@ -79,6 +83,7 @@ namespace ws{
                         if(size != sizeof(uint64_t)) {
                             std::cerr << "ERROR : read error. (ws.cc)\n";
                         }
+                        LB.ExtractDataDromLockFreeQueue();
                     }
                 }
             }
