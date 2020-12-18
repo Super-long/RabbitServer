@@ -64,7 +64,7 @@ public:
 };
 
 // channel_helper负责分发文件描述符
-class channel_helper : public Nocopy{ 
+class channel_helper : public Nocopy{
 private:
     std::vector<std::thread> pool;
     std::vector<std::future<std::queue<int>*> > vec;
@@ -78,7 +78,7 @@ private:
 public:
     explicit channel_helper(LoadBalance& LD) : TrueLD(LD){}
 
-    void loop(); 
+    void loop();
 
     void Distribution(int fd);
 

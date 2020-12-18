@@ -16,24 +16,53 @@
 #include "parsed_header.h"
 
 #include <iostream>
+#include <assert.h>
+
+#ifndef __GNUC__
+
+#define  __attribute__(x)  /*NOTHING*/
+    
+#endif
 
 namespace ws{
 
+    constexpr inline int __attribute__((always_inline)) my_memcmp(const void *buffer1,const void *buffer2,int count) throw() {
+        if (!count)
+            return(0);
+        while ( --count && *(char *)buffer1 == *(char *)buffer2)
+        {
+            buffer1 = (char *)buffer1 + 1;
+                buffer2 = (char *)buffer2 + 1;
+        }
+        return( *((unsigned char *)buffer1) - *((unsigned char *)buffer2) );
+    }
+
+    constexpr inline int __attribute__((always_inline)) my_strlen(const char* str) throw() {
+        const char *p = str;  
+        while(*p)  
+        {  
+            p++;  
+        }  
+        return p-str;
+    }
+
+    // 这里其实可以引入一个优化，就是用数字比较代替字符串比较；
+    // Fix:后期可大量替换strlen，memcmp这样的函数为自己的，写成constexper，最大幅度减少函数调用的开销
     bool ParsedHeader::ParsedHeaderIsEqual(const ParsedHeader& para) const{
         if(length != para.Readable()) return false;
-        if(memcmp(Header, para.ReadPtr(), length) == 0) return true;
+        if(my_memcmp(Header, para.ReadPtr(), length) == 0) return true;
         return false; 
     }
 
     bool ParsedHeader::ParsedHeaderIsEqual(const char* ptr) const{
-        if(length != strlen(ptr)) return false;
-        if(memcmp(Header, ptr, length) == 0) return true;
+        if(length != my_strlen(ptr)) return false;
+        if(my_memcmp(Header, ptr, length) == 0) return true;
         return false;
     }
 
     bool ParsedHeader::ParsedHeaderIsEqual(const std::string& str) const{
         if(length != str.length()) return false;
-        if(memcmp(Header, str.c_str(), length) == 0) return true;
+        if(my_memcmp(Header, str.c_str(), length) == 0) return true;
         return false;
     }
 

@@ -68,7 +68,8 @@ namespace ws{
 
             ~Member() {Socket_Ptr->Close();}
         private:
-            std::function<void(int)> forLoadBalance;    // 这个闭包会传递给writeLoop，写成闭包是为了把负载均衡和输出缓冲区解耦
+            // 这个闭包会传递给writeLoop，写成闭包是为了把负载均衡和输出缓冲区解耦；
+            std::function<void(int)> forLoadBalance;
             std::unique_ptr<Socket> Socket_Ptr;
 
             std::shared_ptr<UserBuffer> User_Buffer;

@@ -71,7 +71,6 @@ void looping(std::promise<std::queue<int>*>& pro, int eventfd, int index, LockFr
                             rea._Manger_.Opera_Member(rea.return_ptr()->front(), EpollCanRead(), [&lfque, index](uint32_t throught){
                                 // 这里捕获了index和lfque
                                 ThreadLoadData temp(throught, index);
-                                //printf("queue -> %p, throught %d\n", &lfque, temp.Throughput);
                                 lfque.push(temp);
                             });
                             rea.return_ptr()->pop();
@@ -113,9 +112,8 @@ void channel_helper::loop(){
 
 // 每到达一个连接就会使用eventfd通信一次
 // TODO 瓶颈所在，可以在一个epoll_wait循环结束以后再执行分发；
-// TODO 这里还可以根据每个线程的实际吞吐量执行更有效的负载均衡
 void channel_helper::Distribution(int fd){
-    auto index = RoundRobin();
+    auto index = WeightedRoundRobin();
     store_[index]->push(fd);
     write(eventfd_[index], &channel_helper::tool, sizeof(tool));
 }

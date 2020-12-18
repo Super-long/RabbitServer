@@ -36,7 +36,7 @@ namespace ws{
             Read_Spot(0),Buffer_(std::make_unique<char[]>(static_cast<size_t>(Length))) {}
 
             size_t Length() const noexcept final{return Buffer_Size;}
-            size_t Readable() const noexcept final{return Write_Spot - Read_Spot;}
+            size_t __attribute__((hot)) __attribute__((pure)) Readable() const noexcept final{return Write_Spot - Read_Spot;}
             size_t Writeable() const noexcept final{return Buffer_Size - Write_Spot;}
             
             const char* ReadPtr() const final{return Buffer_.get() + Read_Spot;}

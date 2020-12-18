@@ -51,7 +51,7 @@ namespace ws{
         return ptr;
     }
 
-    char UserBuffer::Peek(int jump) const{
+    char __attribute__((hot)) __attribute__((pure)) UserBuffer::Peek(int jump) const{
         if(Write_Spot < Read_Spot + jump && Read_Spot + jump < 0 ){
             throw std::out_of_range("'UserBuffer::Peek' The parameter is not in the vaild range.");
         }

@@ -54,7 +54,7 @@ namespace ws{
         private:
             std::unique_ptr<TimerWheel> Timer_Wheel_;
             Epoll& _Epoll_;
-            std::unordered_map<int, std::unique_ptr<Member>> Fd_To_Member;  // 相当于slab
+            std::unordered_map<int, std::unique_ptr<Member>> Fd_To_Member;  // 相当于slab，这里其实数组才是最优的
     };
 }
 
