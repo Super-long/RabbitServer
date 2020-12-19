@@ -3,7 +3,7 @@
 RabbitServer是一个运行于Linux平台的HTTP服务器，采用C++14编写，目前支持处理HTTP/1.1的静态GET，HEAD，OPTIONS请求以及FastCGI请求。
 
 # 特点
-1. Reactor风格
+1. 基于半同步半异步的reactor模型
 2. 使用epoll边缘触发的IO多路复用技术
 3. 使用**独创**的**无锁事件分发模型**
 4. 支持长连接，采用**Timerfd**支持以事件驱动的多轮盘**Timewheel**，以实现应用层TCP保活机制
@@ -20,8 +20,9 @@ RabbitServer是一个运行于Linux平台的HTTP服务器，采用C++14编写，
 15. 大量应用constexper，noexcept，__attribute__等机制以增加代码的优化潜能
 16. 在性能分析过后引入**套接字slab层**，最小化内存分配，提高性能
 17. 引入全局**无锁队列**，实现基于吞吐量和每线程长连接数量的**特殊加权轮询负载均衡**算法 
-18. 整个项目各个子版块交互**设计优良**且子版块之间松耦合，使得维护与优化更为简洁
-19. 运行简单且稳定，直接在后台执行即可，且就测试而言相比于Nginx与Apache请求完成时间波峰不明显且无失败请求，即运行非常稳定
+18. 尝试引入内核5.1版本新特性**io_uring**以提升框架性能，已封装完成，但在一番抉择后放弃引入 
+19. 整个项目各个子版块交互**设计优良**且子版块之间松耦合，使得维护与优化更为简洁
+20. 运行简单且稳定，直接在后台执行即可，且就测试而言相比于Nginx与Apache请求完成时间波峰不明显且无失败请求，即运行非常稳定
 
 # 安装与运行
 运行Rabbitserver之前首先要确保你的机器已经正确配置了Cmake，你可以在软件源中下载并安装Cmake。
@@ -65,7 +66,7 @@ ldconfig 刷新动态库文件
 ```
 这里安装完成以后会出现一个问题，就是gperftools产生的动态库在/usr/local/lib中，而这并不在系统动态库的默认查找路线。一种可行的方法是修改/etc/ld.so.conf，在文件尾部加入/usr/local/lib。
 
-最后性能测试如果需要生成pdf的话需要安装Graphviz。
+性能测试如果需要生成pdf的话需要安装Graphviz。
 ```
 # debian && ubuntu
 sudo apt-get install graphviz graphviz-doc
@@ -73,6 +74,21 @@ sudo apt-get install graphviz graphviz-doc
 # arch
 sudo pacman -S graphviz
 ```
+
+最后因为引入了io_uring，但是最终并没有使用，所以如果机器内核版本低于5.1或者机器并未安装liburing的话可以删除`RabbitServer/src/net/iouring*`,如果想尝试liburing的使用可以尝试编译
+。目前arch的软件源中已经更新了liburing，arch玩家可以在软件源中直接下载并安装liburing，但是debian系的apt-get和苹果的homebrew都没有上线。所以只能自己编译安装了。当然版本低于5.1就只能安装新版本内核，这就比较麻烦了。
+```
+# arch
+sudo pacman -S liburing
+
+# 其他
+wget  https://github.com/axboe/liburing/archive/liburing-0.2.zip
+unzip liburing-0.2.zip
+cd liburing-liburing-0.2/
+./configure --libdir=/usr/lib64 
+make CFLAGS=-std=gnu99 && make install
+```
+
 
 以上步骤完成以后我们就可以运行RabbitServer了。
 ```
@@ -217,7 +233,7 @@ ab -n 1000000 -c 1000 -r 127.0.0.1:8888/ (80)
 
 ---
 
-经过一段时间的优化，基本耗时较长的消耗都集中在内核态了，这也是理想中的情况：
+经过一段时间的优化，可以看到基本耗时较长的消耗都集中在内核态了，这也是理想中的情况：
 
 ![avatar](image/性能分析text.png)
 

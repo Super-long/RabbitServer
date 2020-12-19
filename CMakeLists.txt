@@ -3,8 +3,9 @@ project(Web_Server)
 
 set(CMAKE_CXX_STANDARD 14)
 link_libraries(-pthread -lboost_system -lboost_thread)
-link_libraries(-lprofiler) # 用于性能测试
-link_libraries(-ltcmalloc) # 用于tcmalloc
+link_libraries(-lprofiler)      # 用于性能测试
+link_libraries(-ltcmalloc)      # 用于tcmalloc
+link_libraries(-luring)         # 用于liburing
 
 # https://gcc.gnu.org/onlinedocs/gcc-4.4.7/gcc/Warning-Options.html
 SET(CMAKE_C_FLAGS ${CMAKE_CXX_FLAGS} -g -fno-strict-aliasing -O2 -Wall -Wextra -pipe
