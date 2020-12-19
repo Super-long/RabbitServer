@@ -1,6 +1,6 @@
 # 介绍
 
-RabbitServer是一个运行于Linux平台的HTTP服务器，采用C++14编写，目前支持处理HTTP/1.1的静态GET，HEAD，OPTIONS请求以及FastCGI请求。
+RabbitServer是一个运行于GNU/Linux平台的HTTP服务器，采用C++14编写，目前支持处理HTTP/1.1的静态GET，HEAD，OPTIONS请求以及FastCGI请求。
 
 # 特点
 1. 基于半同步半异步的reactor模型
@@ -233,7 +233,7 @@ ab -n 1000000 -c 1000 -r 127.0.0.1:8888/ (80)
 
 ---
 
-经过一段时间的优化，可以看到基本耗时较长的消耗都集中在内核态了，这也是理想中的情况：
+经过一段时间针对性的性能优化，可以看到基本耗时较长的消耗都集中在内核态了，这也是理想中的情况：
 
 ![avatar](image/性能分析text.png)
 

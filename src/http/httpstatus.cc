@@ -18,7 +18,7 @@
 namespace ws{
     
     //For debugging
-    std::ostream& operator<<(std::ostream& os, const HttpParser_Content& para){
+    std::ostream&  [[deprecated]] operator<<(std::ostream& os, const HttpParser_Content& para){
         using std::endl;
         os << "method : " << static_cast<int>(para.method) << endl;
         os << "Status : " << static_cast<int>(para.Status) << endl;

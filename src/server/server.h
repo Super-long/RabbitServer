@@ -35,6 +35,7 @@ namespace ws{
             std::unique_ptr<Socket> Server_Accept(); 
             void Server_Accept(fun&& f);
             void Server_BindAndListen();
+            int Server_DeferAccept();
 
             int Set_AddrRUseA() {return Set_Socket(SO_REUSEADDR, SOL_SOCKET);}  // 防止服务器重启受阻
             // https://blog.csdn.net/chen_fly2011/article/details/56480925?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522160761747019725271062162%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=160761747019725271062162&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduend~default-1-56480925.first_rank_v2_pc_rank_v29&utm_term=SO_REUSEPORT&spm=1018.2118.3001.4449

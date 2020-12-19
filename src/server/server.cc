@@ -21,7 +21,7 @@
 
 namespace{
     template <typename T>
-    T max(T&& a,T&& b){
+    constexpr T max(T&& a,T&& b) throw() {
         return a > b ? a : b;
     }
 }
@@ -73,7 +73,7 @@ namespace ws{
         } */
     }
 
-    void Server::Server_BindAndListen(){ 
+    void Server::Server_BindAndListen(){
         assert(Addr_ != nullptr); 
         int para1 = bind(fd(), Addr_->Return_Pointer(), Addr_->Return_length());
         if(para1 == -1) throw std::runtime_error("'Server_BindAndListen' : error in bind.");
@@ -91,5 +91,10 @@ namespace ws{
         */
         struct linger buffer_ = {1,0};
         return setsockopt(fd(), SOL_SOCKET, SO_LINGER, &buffer_, sizeof(buffer_));
+    }
+
+    int Server::Server_DeferAccept(){
+        int soValue = 10;   // 一个magic number https://my.oschina.net/orion/blog/51575
+        return setsockopt(fd(), IPPROTO_TCP, TCP_DEFER_ACCEPT, &soValue, sizeof(soValue));
     }
 }

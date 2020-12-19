@@ -45,19 +45,17 @@ namespace ws{
         try{
             signal(SIGPIPE, SIG_IGN);
 
-            // 其实这两个玩意对于性能没有啥帮助；《[读入，输出优化](https://oi-wiki.org/contest/io/)》
-/*             std::ios::sync_with_stdio(false);
-            std::cin.tie(nullptr); */
-
             _Server_.Set_AddrRUseA();
             _Server_.Base_Setting();
             _Server_.Server_BindAndListen();
+            _Server_.Server_DeferAccept();
+
             _Epoll_.Add(_Server_, EpollOnlyRead());
             _Epoll_.Add(_Timer_, EpollOnlyRead());  // 处理连接，又是单线程，只注册一个可读事件即可
             _Timer_.SetTimer();
 
             LockFreeQueue<ThreadLoadData> que;
-            LoadBalance LB(que);    // 负载均衡器
+            LoadBalance LB(que);                    // 负载均衡器
 
             EpollEvent_Result Event_Reault(Y_Dragon::EventResult_Number());
             channel_helper Channel_(LB);

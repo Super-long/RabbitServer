@@ -18,6 +18,12 @@
 
 #include <iostream>
 
+#ifndef __GNUC__
+
+#define  __attribute__(x)  /*NOTHING*/
+    
+#endif
+
 namespace ws{
 
     enum HttpStatusCode{
@@ -121,7 +127,7 @@ namespace ws{
         
         HttpFlag Set_Ka = Keep_Alive;
 
-        void init() noexcept {    // 用于在每次解析的时候重新初始化状态而不是重新设置上指针
+        void init() noexcept {    // 用于在每次解析的时候重新初始化状态而不是重新设置指针
             method = HRInit;
             Status = HPSOK;
             Fault = HPFOK;
@@ -140,7 +146,6 @@ namespace ws{
     };
 
     std::ostream& operator<<(std::ostream& os, const HttpParser_Content& para);
-
 
     constexpr const char* StatusCode_to_String(int statuscode){
         HttpStatusCode para = static_cast<HttpStatusCode>(statuscode);
@@ -183,13 +188,11 @@ namespace ws{
         }
     }
 
-    constexpr bool isheader(char c) {
+    constexpr bool __attribute__((const)) isheader(char c) throw() {
         return isalnum(c) || c == '-' || c == '_';
     }
 
-
-    constexpr bool isuri(char c) {
-    bool isuri[] = {
+    constexpr bool is_uri[] = {
     /*0   nul    soh    stx    etx    eot    enq    ack    bel     7*/
         false, false, false, false, false, false, false, false,
     /*8   bs     ht     nl     vt     np     cr     so     si     15*/
@@ -224,11 +227,11 @@ namespace ws{
         true, true, true, false, false, false, false, false
     };
 
-    return (c >= 0) ? isuri[c] : false;
+    constexpr bool inline __attribute__((const)) isuri(char c) throw() {
+        return (c >= 0) ? is_uri[c] : false;
     }
 
-    constexpr bool isvalue(char c) {
-    bool isvalue[] = {
+    constexpr bool is_value[] = {
     /*0   nul    soh    stx    etx    eot    enq    ack    bel     7*/
         false, false, false, false, false, false, false, false,
     /*8   bs     ht     nl     vt     np     cr     so     si     15*/
@@ -263,8 +266,11 @@ namespace ws{
         true, true, true, true, true, true, true, false
     };
 
-    return (c >= 0) ? isvalue[c] : false;
+    // 这个函数曾占到了CPU执行的3.2%，很恐怖的一个数字，因为把is_value直接放在函数中了，导致每次都会压栈一个长度为128的数组；修改后占比0.4%；
+    constexpr bool inline __attribute__((hot)) __attribute__((const)) __attribute__((always_inline)) isvalue(char c) throw() {
+        return (c >= 0) ? is_value[c] : false;
     }
+
 }
 
 #endif
