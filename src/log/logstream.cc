@@ -21,11 +21,11 @@ namespace ws{
 
 namespace detail{
 
-//更快的转换
+// 更快的转换
 // Efficient Integer to String Conversions, by Matthew Wilson.
-const char digits[] = "9876543210123456789";
-const char* zero = digits + 9;
-const char digitsHex[] = "0123456789ABCDEF";
+constexpr const char digits[] = "9876543210123456789";
+constexpr const char* zero = digits + 9;
+constexpr const char digitsHex[] = "0123456789ABCDEF";
 
 template<typename T>
 size_t convert(char buf[], T value){

@@ -47,7 +47,7 @@ public:
 
     struct Filewrapper{
         template<int Num>
-        Filewrapper(const char (&arr)[Num]) //匹配char数组 
+        Filewrapper(const char (&arr)[Num]) //匹配char数组（数组的引用）
             :data_(arr), size_(Num - 1){
                 const char* point = strrchr(data_, '/');
                 if(point){

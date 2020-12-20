@@ -33,7 +33,7 @@ constexpr int LargerBuffer = 4048*1000; //感觉有点太大了
 
 template<int BufferSize>
 class FixedBuffer : public Nocopy{
-public:
+public: 
     FixedBuffer() : Spot(0), Buffer_(std::make_unique<char[]>(BufferSize)){
         setcookie(CookieStart); 
     }
@@ -58,7 +58,7 @@ public:
     }
 private:
     std::unique_ptr<char[]> Buffer_;
-    std::function<void()> cookie_;
+    std::function<void()> cookie_;  // 用于在 core dump 文件中查找丢失的日志，其值为某个函数的地址；
     uint32_t Spot;
 
     const char* end() const {return std::advance(Buffer_, Length());}

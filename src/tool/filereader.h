@@ -20,6 +20,8 @@
 #include <string>  
 
 namespace ws{ 
+    
+    // 起名为filereader其实并不贴切，应该为Filesendfile 
     class FileReader : public FileProxy{ 
         public:
             explicit FileReader(const char* path) : FileProxy(path){}

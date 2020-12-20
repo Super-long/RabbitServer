@@ -86,10 +86,10 @@ namespace detail{
         gmtime_r(now, &tm);
         strftime(timebuf, sizeof timebuf, ".%Y%m%d-%H%M%S.", &tm); //格式化一个时间字符串
         filename += timebuf;
-
-        // TODO filename += hostname
+        constexpr char hostname[] = {"lizhaolong"}; 
+        filename += hostname;
         char pidbuf[32] = {0};
-        // TODO snprintf(pidbuf, sizeof pidbuf, ".%d", ProcessInfo::pid());
+        // snprintf(pidbuf, sizeof pidbuf, ".%d", pid());   // pid可以缓存
         //filename += pidbuf;
 
         filename += ".log";
@@ -103,7 +103,7 @@ namespace detail{
 
         if (file_->writtenBytes() > rollSize_){//已写入的数据大于预设数据 换文件写
             rollFile();
-        }else{
+        }else{ 
             ++count_;
             if (count_ >= checkEveryN_){//写入buffer大于checkEveryN_
                 count_ = 0;
@@ -111,8 +111,7 @@ namespace detail{
                 time_t thisPeriod_ = now - now%Daypreseconds;
                 if (thisPeriod_ != startOfPeriod_){//超过一天切换文件
                     rollFile();
-                }
-                else if (now - lastFlush_ > flushInterval_){//刷新间隔可变 主要看到时候日志多不多
+                } else if (now - lastFlush_ > flushInterval_){//刷新间隔可变 主要看到时候日志多不多
                     lastFlush_ = now;
                     file_->flush();
                 }

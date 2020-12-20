@@ -20,7 +20,7 @@
 
 namespace ws{
 
-namespace detail{
+namespace detail{ 
 
     FileAppend::FileAppend(const std::string& filename) 
     : fp_(::fopen(filename.c_str(), "ae")), //e -> O_CLOEXEC

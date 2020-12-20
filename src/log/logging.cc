@@ -66,8 +66,8 @@ constexpr const char* LogLevelName[logging::NUM_LOG_LEVELS] = {
         "FATAL ",
 };
 
-//TODO helper class for known string length at compile time 没搞懂为什么
-struct helper{ //TODO 可以到时候改成constexper
+//TODO helper class for known string length at compile time
+struct helper{
     constexpr helper(const char* str, unsigned len)
             :str_(str),
              len_(len){
@@ -189,25 +189,27 @@ template<typename logging::Loglevel LEVEL>
 void
 loggingFactory<LEVEL>::initResourse(logging::Filewrapper file, int line, typename ws::detail::logging::Loglevel level){
         LogData.reset(new logging(file, line, level));
-    }
+}
 
 template<typename logging::Loglevel LEVEL>
 logging&
 loggingFactory<LEVEL>::getStream(logging::Filewrapper file, int line, int old_errno,  typename ws::detail::logging::Loglevel level){
- std::call_once(resourse_flag, &loggingFactory::initResourse, this, file, line, level);
-        logstream& Stream = LogData->stream();
+    std::call_once(resourse_flag, &loggingFactory::initResourse, this, file, line, level);
+    
+    logstream& Stream = LogData->stream();
         
     LogData->wrapper_.time_.swap(Timestamp::now());
     LogData->wrapper_.formatTime();
-    //TODO
+
     //CurrentThread::tid();
     //stream_ << T(CurrentThread::tidString(), CurrentThread::tidStringLength());
     std::string str("111111");
     Stream << helper(str.c_str(), 6);
     Stream << helper(LogLevelName[static_cast<size_t>(level)], 6);
+    
     if (old_errno != 0){
        Stream << strerror_tl(old_errno) << " (errno=" << old_errno << ") ";
-    } 
+    }
 
     LogData->wrapper_.finish();
     const logstream::Buffer& buf(LogData->stream().buffer());
@@ -216,7 +218,7 @@ loggingFactory<LEVEL>::getStream(logging::Filewrapper file, int line, int old_er
     
     if(LogData->wrapper_.level_ == logging::FATAL){ 
         g_flush_();
-        abort();
+        abort();    // 当然这里是可以改的
     }
     return *LogData;
 }
@@ -226,6 +228,11 @@ loggingFactory<LEVEL>::~loggingFactory(){
         const logstream::Buffer& buf(LogData->stream().buffer());
         g_output_(buf.data(), buf.Length());
     }
+
+
+/**
+ * @notes: 不同的日志等级会产生不同的模板实例化
+ * */
 
 logging& log_DEBUG(logging::Filewrapper file, int line, int olderrno){
     static loggingFactory<logging::DEBUG> loog;

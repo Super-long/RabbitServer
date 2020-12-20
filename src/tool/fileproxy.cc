@@ -50,6 +50,14 @@ namespace ws{
         : File_Description(openat(path1.fd(), path2, O_RDONLY)){
         //File_Description(openat(AT_FDCWD, path2, O_RDONLY)){
         //File_Description(open(path2, O_RDONLY)){
-        }
+    }
+
+    /**
+     * @notes: 这个函数用于要把文件从内核态拿出来的时候，对page cache做一个假设，减少页的浪费
+    */
+    void FileProxy::DoFadvise(int advice){
+        // 从文件的起始开始读，直到文件的末尾
+        posix_fadvise(fd(), 0, 0, advice);
+    }
 
 }

@@ -20,7 +20,7 @@ RabbitServer是一个运行于GNU/Linux平台的HTTP服务器，采用C++14编�
 15. 大量应用constexper，noexcept，__attribute__等机制以增加代码的优化潜能
 16. 在性能分析过后引入**套接字slab层**，最小化内存分配，提高性能
 17. 引入全局**无锁队列**，实现基于吞吐量和每线程长连接数量的**特殊加权轮询负载均衡**算法 
-18. 尝试引入内核5.1版本新特性**io_uring**以提升框架性能，已封装完成，但在一番抉择后放弃引入 
+18. 尝试引入内核5.1版本新特性**io_uring**以提升框架性能，已封装完成，但在抉择后放弃引入 
 19. 整个项目各个子版块交互**设计优良**且子版块之间松耦合，使得维护与优化更为简洁
 20. 运行简单且稳定，直接在后台执行即可，且就测试而言相比于Nginx与Apache请求完成时间波峰不明显且无失败请求，即运行非常稳定
 
@@ -75,8 +75,9 @@ sudo apt-get install graphviz graphviz-doc
 sudo pacman -S graphviz
 ```
 
-最后因为引入了io_uring，但是最终并没有使用，所以如果机器内核版本低于5.1或者机器并未安装liburing的话可以删除`RabbitServer/src/net/iouring*`,如果想尝试liburing的使用可以尝试编译
-。目前arch的软件源中已经更新了liburing，arch玩家可以在软件源中直接下载并安装liburing，但是debian系的apt-get和苹果的homebrew都没有上线。所以只能自己编译安装了。当然版本低于5.1就只能安装新版本内核，这就比较麻烦了。
+最后为了提升性能引入了io_uring，但是最终并没有使用，所以如果机器内核版本低于5.1或者机器并未安装liburing的话可以删除`RabbitServer/src/net/iouring*`,如果想尝试liburing的使用可以尝试编译。
+
+目前arch的软件源中已经更新了liburing，arch玩家可以在软件源中直接下载并安装liburing，但是debian系的apt-get和苹果的homebrew都没有上线。所以只能自己编译安装了。当然版本低于5.1就只能安装新版本内核，这就比较麻烦了。
 ```
 # arch
 sudo pacman -S liburing
@@ -233,7 +234,7 @@ ab -n 1000000 -c 1000 -r 127.0.0.1:8888/ (80)
 
 ---
 
-经过一段时间针对性的性能优化，可以看到基本耗时较长的消耗都集中在内核态了，这也是理想中的情况：
+经过一段时间针对性的性能优化，可以看到基本耗时较长的消耗都集中在开销较大的系统调用了，这也是理想中的情况：
 
 ![avatar](image/性能分析text.png)
 

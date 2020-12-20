@@ -37,6 +37,7 @@ AsyncLogging::AsyncLogging(const std::string& name,
       buffers_.reserve(16);
     }
 
+// 显然需要调用以后才能跑
 void 
 AsyncLogging::start(){
     running = true;
@@ -69,7 +70,7 @@ AsyncLogging::append(const char* line, int len){
 
 void
 AsyncLogging::AsyncFunc(){
-    logfile output(basename, rollsize_, false);
+    logfile output(basename, rollsize_, false); 
     Bufferptr newBuffer1(new Buffer);
     Bufferptr newBuffer2(new Buffer);
     newBuffer1->setZero();
