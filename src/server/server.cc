@@ -83,7 +83,7 @@ namespace ws{
 
     inline int Server::Set_Linger(){
         /*
-         * 客户端收到WSAECONNRESET
+         * 客户端收到ECONNRESET(linux) WSAECONNRESET(windows)
         struct linger {
             int l_onoff;  0 = off, nozero = on 
             int l_linger;  linger time 
@@ -92,6 +92,15 @@ namespace ws{
         struct linger buffer_ = {1,0};
         return setsockopt(fd(), SOL_SOCKET, SO_LINGER, &buffer_, sizeof(buffer_));
     }
+
+    // 我怎么觉得一点也不优雅
+    inline int Server::Set_GracefullyClose(){       
+
+        struct linger buffer_ = {1,1};
+        return setsockopt(fd(), SOL_SOCKET, SO_LINGER, &buffer_, sizeof(buffer_));
+    }
+
+
 
     int Server::Server_DeferAccept(){
         int soValue = 10;   // 一个magic number https://my.oschina.net/orion/blog/51575

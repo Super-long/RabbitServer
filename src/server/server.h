@@ -45,8 +45,9 @@ namespace ws{
             int Set_Nodelay() {return Set_Socket(TCP_NODELAY, SOL_TCP);}        // Nagle
             int Set_COPK() {return Set_Socket(TCP_CORK, SOL_TCP);}              // TCP_CORK可以提升吞吐量，在确认要传输传输大于MSS的数据时使用
             int Set_QuickAck() {return Set_Socket(TCP_QUICKACK, SOL_TCP);}      // 禁止延迟确认机制，减少时延
-            int Base_Setting() {return Set_Socket(TCP_NODELAY | TCP_QUICKACK, SOL_TCP);}    // 减少一次系统调用
+            int Base_Setting() {return Set_Socket(TCP_NODELAY | TCP_QUICKACK, SOL_TCP);}    // 显然在只有少量小包的时候效率会提升
             int Set_Linger();   // close时直接发送RST报文
+            int Set_GracefullyClose();  // 优雅关闭
 
         private:
             std::unique_ptr<Address> Addr_;

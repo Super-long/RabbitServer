@@ -47,7 +47,7 @@ namespace ws{
 
             _Server_.Set_AddrRUseA();
             _Server_.Base_Setting();
-            _Server_.Server_BindAndListen();
+            _Server_.Server_BindAndListen(); 
             _Server_.Server_DeferAccept();
 
             _Epoll_.Add(_Server_, EpollOnlyRead());

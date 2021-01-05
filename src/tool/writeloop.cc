@@ -17,6 +17,7 @@
 
 #include <cstdarg>
 #include <sys/socket.h>
+#include <netinet/tcp.h> 
 
 #ifndef __GNUC__
 
@@ -103,9 +104,17 @@ namespace ws{
     WriteLoop::COMPLETETYPE __attribute__((hot)) WriteLoop::SendFile(std::shared_ptr<FileReader> ptr){
         ssize_t len = 0;
         ++interval;
+
+        // 对于大文件的发送跑一个优化，没等到数据到最大包长的时候才发送；
+        // 当然为此付出两个系统调用的代价是否是值得的也不好说，性能测试上没啥大差别，当然和文件大小太小可能也有关系；
+        int on = 1;
+        setsockopt(fd_, SOL_TCP, TCP_CORK, &on, sizeof (on)); /* cork */ 
         while(len = ptr->SendFile(fd_) && len > 0){
             throughout += len;
         }
+        on = 0; 
+        setsockopt(fd_, SOL_TCP, TCP_CORK, &on, sizeof (on)); /* 拔去塞子 */ 
+
         if(!ptr->Send_End()){
             InsertSendFile(ptr);
             return IMCOMPLETE;

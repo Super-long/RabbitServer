@@ -7,7 +7,9 @@
 #ifndef LOCKFREEQUEUE_H_
 #define LOCKFREEQUEUE_H_
 
-// https://blog.csdn.net/weixin_42250655/article/details/108583128
+// https://coolshell.cn/articles/8239.html
+
+// ABA问题不会影响代码，因为就算队列尾部在A线程被切换以后出现入队再出队的情况也没关系；
 
 namespace ws{
 

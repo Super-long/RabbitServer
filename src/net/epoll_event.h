@@ -40,9 +40,17 @@ namespace ws{
         EETPRI        = ::EPOLLPRI,     // 外带数据
 
         // EPOLLHUP不需要在epoll中设置，默认注册，见man手册；
-        EETHUP        = ::EPOLLHUP      // 当socket的一端认为对方发来了一个不存在的4元组请求的时候,会回复一个RST响应,在epoll上会响应为EPOLLHUP事件
+        EETHUP        = ::EPOLLHUP,     // 当socket的一端认为对方发来了一个不存在的4元组请求的时候,会回复一个RST响应,在epoll上会响应为EPOLLHUP事件
         // linux - TCP:何时生成EPOLLHUP？https://www.coder.work/article/172009
         // https://man7.org/linux/man-pages/man2/epoll_ctl.2.html
+        EETWAKEUP     = ::EPOLLWAKEUP,
+        /*
+        * 如果系统设置了自动休眠模式（通过/sys/power/autosleep），当唤醒设备的事件发生时，设备驱动会保持
+        * 唤醒状态，直到事件进入排队状态。为了保持设备唤醒直到事件处理完成，必须使用epoll EPOLLWAKEUP 标记。
+        * 一旦给structe poll_event中的events字段设置了EPOLLWAKEUP标记，系统会在事件排队时就保持唤醒，从
+        * epoll_wait调用开始，持续要下一次epoll_wait调用。
+        */
+        EETEXCLUSIVE  = ::EPOLLEXCLUSIVE    // 避免惊群，此模型不需要
     };
 
     // EpollTypeBase的设置意味着我们在收到半关闭时仍然会关闭连接；

@@ -23,7 +23,7 @@
 namespace ws{
     class Address : public Copyable{ 
         public:
-            explicit Address(const struct sockaddr_in& para) : addr_(para){}
+            explicit Address(const struct sockaddr_in& para) : addr_(para){} 
             Address(const char* IP, int port);
             explicit Address(int port);
 
